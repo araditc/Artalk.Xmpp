@@ -174,8 +174,8 @@ The following example demonstrates how to set up event handlers for the events e
             }
         }
     }
-    ```
-    
+```
+
 2.  Whenever a chat-message is sent to myusername@artalk.ir, the OnNewMessage method will be invoked. The  MessageEventArgs  parameter contains information about the sender of the message as well its content.
     
 
