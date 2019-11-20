@@ -1,6 +1,9 @@
 # Artalk.Xmpp
 This repository contains an easy-to-use and well-documented .NET assembly for communicating with an XMPP server. It supports basic Instant Messaging and Presence funtionality as well as a variety of XMPP extensions.
 
+### NuGet 
+You can download this package from [NuGet](https://www.nuget.org/packages/Artalk.Xmpp/)
+
 # Introduction
 
 **Artalk Xmpp** is an easy-to-use and well-documented .NET assembly for communicating with an XMPP server. It supports basic Instant Messaging and Presence funtionality as well as a variety of XMPP extensions.
