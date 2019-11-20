@@ -102,8 +102,8 @@ The following example demonstrates how to connect to an XMPP server using the  A
 If you already have an account on the server to which you want to connect, establishing a connection is as easy as initializing a new instance of the  ArtalkXmppClient  class und calling the  Connect  method as demonstrated in the following example application:
 
 ### C#
-```
-                               
+
+```                               
 using Artalk.Xmpp.Client;
 using System;
 using System.Text.RegularExpressions;
@@ -145,6 +145,7 @@ The following example demonstrates how to set up event handlers for the events e
     
    ### C#
     
+    ```
     using Artalk.Xmpp.Client;
     using System;
     
@@ -174,6 +175,7 @@ The following example demonstrates how to set up event handlers for the events e
             }
         }
     }
+    ```
     
 2.  Whenever a chat-message is sent to myusername@artalk.ir, the OnNewMessage method will be invoked. The  MessageEventArgs  parameter contains information about the sender of the message as well its content.
     
