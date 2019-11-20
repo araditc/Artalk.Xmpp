@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artalk.WinClient", "Artalk.WinClient\Artalk.WinClient.csproj", "{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{77CF49CF-0343-4647-978D-3E3FCB45B499}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{99EE8460-AF37-442C-BB29-3232358A1049}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artalk.Xmpp", "Artalk.Xmpp\Artalk.Xmpp.csproj", "{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4} = {77CF49CF-0343-4647-978D-3E3FCB45B499}
+		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA} = {99EE8460-AF37-442C-BB29-3232358A1049}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AF58CFD7-08D8-4893-B3F4-DE1F0C701A29}
+	EndGlobalSection
+EndGlobal

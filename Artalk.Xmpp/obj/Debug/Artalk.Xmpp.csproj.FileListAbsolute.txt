@@ -1,0 +1,8 @@
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\bin\Debug\Artalk.Xmpp.xml
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\bin\Debug\Artalk.Xmpp.dll
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\bin\Debug\Artalk.Xmpp.pdb
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\obj\Debug\Artalk.Xmpp.csprojAssemblyReference.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\obj\Debug\Interop.UPNPLib.dll
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\obj\Debug\Artalk.Xmpp.csproj.ResolveComReference.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\obj\Debug\Artalk.Xmpp.dll
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\obj\Debug\Artalk.Xmpp.pdb
