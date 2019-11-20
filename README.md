@@ -103,7 +103,7 @@ If you already have an account on the server to which you want to connect, estab
 
 ### C#
 
-```                               
+```C#                               
 using Artalk.Xmpp.Client;
 using System;
 using System.Text.RegularExpressions;
@@ -130,7 +130,7 @@ namespace ArtalkTest {
 
 ### Send Message
 
-```
+```C#
 client.SendMessage(recipient, message);
 ```
 Using the constructor of the ArtalkXmppClient class as in the example above will automatically negotiate TLS/SSL encryption if the server supports it, however this behaviour can be disabled by passing the constructor a value of false for the tls parameter.
@@ -145,7 +145,7 @@ The following example demonstrates how to set up event handlers for the events e
     
    ### C#
     
-    ```
+    ```C#
     using Artalk.Xmpp.Client;
     using System;
     
