@@ -143,9 +143,8 @@ The following example demonstrates how to set up event handlers for the events e
 
 1.  The  ArtalkXmppClient  class exposes a variety of events that can be subscribed to in order to be notified of the receipt of new chat messages, status changes of a chat contact, incoming authorization requests, etc. The following piece of example code shows how to hook up to the  Message  event in order to be notified of the receipt of new chat-messages:
     
-   ### C#
-    
-    ```C#
+   ```C#
+
     using Artalk.Xmpp.Client;
     using System;
     
