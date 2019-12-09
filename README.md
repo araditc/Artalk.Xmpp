@@ -192,5 +192,4 @@ You should not call blocking methods from within event handlers and you must not
 
 # Donate
 
-![Donate](https://camo.githubusercontent.com/5d8fd83ae512a807bc1542589fb777812cf45779/68747470733a2f2f7777772e70617970616c6f626a656374732e636f6d2f7765627374617469632f64655f44452f692f64652d70702d6c6f676f2d31303070782e706e67)
-[Donate](https://paypal.me/araditcco?locale.x=en_US)
+![Donate](https://paypal.me/araditcco?locale.x=en_US)
