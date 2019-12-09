@@ -192,4 +192,4 @@ You should not call blocking methods from within event handlers and you must not
 
 # Donate
 
-![Donate](https://paypal.me/araditcco?locale.x=en_US)
+[Donate](https://paypal.me/araditcco?locale.x=en_US)
