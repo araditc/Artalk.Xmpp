@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Arad ITC</Authors>
+    <Company>Arad ITC</Company>
+    <Description>A .net core 3.1 library for communicating with an XMPP server</Description>
+    <Copyright>Copyright © AradITC 2019</Copyright>
+    <PackageProjectUrl>https://github.com/araditc/Artalk.Xmpp</PackageProjectUrl>
+    <PackageIcon>arad-Logo.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Client\Examples.xml" />
+    <None Remove="favicon.ico" />
+    <None Include="..\..\..\..\..\..\Pic\arad-Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Client\Examples.xml" />
+    <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0-rc.1.20451.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Interop.UPNPLib">
+      <HintPath>obj\Interop.UPNPLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

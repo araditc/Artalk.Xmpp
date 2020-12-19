@@ -1,0 +1,11 @@
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\bin\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.deps.json
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\bin\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.dll
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\bin\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.pdb
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\bin\Debug\netcoreapp3.1\Interop.UPNPLib.dll
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\obj\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.csprojAssemblyReference.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\obj\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.AssemblyInfoInputs.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\obj\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.AssemblyInfo.cs
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\obj\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.csproj.CoreCompileInputs.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\obj\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.csproj.CopyComplete
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\obj\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.dll
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.Xmpp.NetCore\obj\Debug\netcoreapp3.1\Artalk.Xmpp.NetCore.pdb

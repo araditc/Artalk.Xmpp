@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "/qFr8fD8xpNkk7TP4CjQC5TO7oqYl7yqddzx+ruRsN9+PZ80Rw7jbgDHqXYYKJ/XtqgU10XhhyTdNZHaG9fpOg==",
+  "success": true,
+  "projectFilePath": "D:\\MyDocuments\\SourceCode\\XMPP\\ArtalkXMPP\\GitHub\\Artalk.Xmpp\\Artalk.Xmpp.NetCore\\Artalk.Xmpp.NetCore.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ammar\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0-rc.1.20451.14\\microsoft.netcore.platforms.5.0.0-rc.1.20451.14.nupkg.sha512",
+    "C:\\Users\\ammar\\.nuget\\packages\\microsoft.win32.systemevents\\5.0.0-rc.1.20451.14\\microsoft.win32.systemevents.5.0.0-rc.1.20451.14.nupkg.sha512",
+    "C:\\Users\\ammar\\.nuget\\packages\\system.drawing.common\\5.0.0-rc.1.20451.14\\system.drawing.common.5.0.0-rc.1.20451.14.nupkg.sha512"
+  ],
+  "logs": []
+}
