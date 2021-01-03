@@ -8,6 +8,7 @@
     <Copyright>Copyright © AradITC 2019</Copyright>
     <PackageProjectUrl>https://github.com/araditc/Artalk.Xmpp</PackageProjectUrl>
     <PackageIcon>arad-Logo.png</PackageIcon>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
