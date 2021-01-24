@@ -1,0 +1,14 @@
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\bin\Debug\Artalk.WinClient.exe.config
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\bin\Debug\Artalk.WinClient.exe
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\bin\Debug\Artalk.WinClient.pdb
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\bin\Debug\Artalk.Xmpp.dll
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\bin\Debug\Artalk.Xmpp.pdb
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\bin\Debug\Artalk.Xmpp.xml
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.csprojAssemblyReference.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.MainForm.resources
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.Properties.Resources.resources
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.csproj.GenerateResource.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.csproj.CoreCompileInputs.cache
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.csproj.CopyComplete
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.exe
+D:\MyDocuments\SourceCode\XMPP\ArtalkXMPP\GitHub\Artalk.Xmpp\Artalk.WinClient\obj\Debug\Artalk.WinClient.pdb

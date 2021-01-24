@@ -9,9 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{77CF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{99EE8460-AF37-442C-BB29-3232358A1049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artalk.Xmpp", "Artalk.Xmpp\Artalk.Xmpp.csproj", "{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Artalk.Xmpp", "Artalk.Xmpp.NetCore\Artalk.Xmpp.csproj", "{CA368356-D6C2-41CC-9B60-F95CB4A06AE5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Artalk.Xmpp.NetCore", "Artalk.Xmpp.NetCore\Artalk.Xmpp.NetCore.csproj", "{CA368356-D6C2-41CC-9B60-F95CB4A06AE5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{013B7104-141D-4F43-9E67-A8519A01A114}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +26,6 @@ Global
 		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CA368356-D6C2-41CC-9B60-F95CB4A06AE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CA368356-D6C2-41CC-9B60-F95CB4A06AE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA368356-D6C2-41CC-9B60-F95CB4A06AE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,7 +36,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{28AEAE2E-1284-48F2-8D0E-C8949F17C6A4} = {77CF49CF-0343-4647-978D-3E3FCB45B499}
-		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA} = {99EE8460-AF37-442C-BB29-3232358A1049}
 		{CA368356-D6C2-41CC-9B60-F95CB4A06AE5} = {99EE8460-AF37-442C-BB29-3232358A1049}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

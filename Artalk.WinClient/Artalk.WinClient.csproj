@@ -81,11 +81,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Artalk.Xmpp\Artalk.Xmpp.csproj">
-      <Project>{9ea99e39-8c5c-4f69-9f3f-8e3074c518fa}</Project>
-      <Name>Artalk.Xmpp</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

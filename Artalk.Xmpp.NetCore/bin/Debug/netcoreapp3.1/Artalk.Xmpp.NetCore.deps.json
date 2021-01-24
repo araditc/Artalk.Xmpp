@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "Artalk.Xmpp.NetCore/1.0.0": {
+      "Artalk.Xmpp.NetCore/1.0.1": {
         "dependencies": {
           "System.Drawing.Common": "5.0.0-rc.1.20451.14",
           "Interop.UPNPLib": "1.0.0.0"
@@ -71,7 +71,7 @@
     }
   },
   "libraries": {
-    "Artalk.Xmpp.NetCore/1.0.0": {
+    "Artalk.Xmpp.NetCore/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

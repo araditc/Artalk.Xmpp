@@ -1,20 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net48;net5.0</TargetFrameworks>
     <Authors>Arad ITC</Authors>
     <Company>Arad ITC</Company>
-    <Description>A .net core 3.1 library for communicating with an XMPP server</Description>
-    <Copyright>Copyright © AradITC 2019</Copyright>
+    <Description>A dotnet frame work 4.8, .net core 3.1 &amp; .net 5 library for communicating with an XMPP server</Description>
+    <Copyright>Copyright © AradITC 20201</Copyright>
     <PackageProjectUrl>https://github.com/araditc/Artalk.Xmpp</PackageProjectUrl>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <Product>Artalk.Xmpp</Product>
+    <PackageId>Artalk.Xmpp</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyName>Artalk.Xmpp</AssemblyName>
+    <RootNamespace>Artalk.Xmpp</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Client\Examples.xml" />
     <None Remove="favicon.ico" />
-    <None Include="..\..\..\..\..\..\Pic\arad-Logo.png">
+    <None Include="arad-Logo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
@@ -26,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0-rc.1.20451.14" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
