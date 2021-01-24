@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{77CF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{99EE8460-AF37-442C-BB29-3232358A1049}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Artalk.Xmpp", "Artalk.Xmpp.NetCore\Artalk.Xmpp.csproj", "{CA368356-D6C2-41CC-9B60-F95CB4A06AE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Artalk.Xmpp", "Artalk.Xmpp\Artalk.Xmpp.csproj", "{CA368356-D6C2-41CC-9B60-F95CB4A06AE5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{013B7104-141D-4F43-9E67-A8519A01A114}"
 	ProjectSection(SolutionItems) = preProject

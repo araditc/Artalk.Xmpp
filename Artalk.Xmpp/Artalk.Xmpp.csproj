@@ -1,222 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Artalk.Xmpp</RootNamespace>
+    <TargetFrameworks>netcoreapp3.1;net48;net5.0</TargetFrameworks>
+    <Authors>Arad ITC</Authors>
+    <Company>Arad ITC</Company>
+    <Description>A dotnet frame work 4.8, .net core 3.1 &amp; .net 5 library for communicating with an XMPP server</Description>
+    <Copyright>Copyright © AradITC 20201</Copyright>
+    <PackageProjectUrl>https://github.com/araditc/Artalk.Xmpp</PackageProjectUrl>
+    <PackageIcon>arad-Logo.png</PackageIcon>
+    <Version>1.0.2</Version>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <Product>Artalk.Xmpp</Product>
+    <PackageId>Artalk.Xmpp</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <RootNamespace>Artalk.Xmpp</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Artalk.Xmpp.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>favicon.ico</ApplicationIcon>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <None Remove="Client\Examples.xml" />
+    <None Remove="favicon.ico" />
+    <None Include="arad-Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Client\FileTransferSettings.cs" />
-    <Compile Include="Client\ArtalkXmppClient.cs" />
-    <Compile Include="Core\ErrorEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0004\DataForms.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\BooleanField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\CancelForm.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\DataField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\DataFieldType.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\DataForm.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\DataFormFactory.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\DataFormType.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\FieldList.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\FixedField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\HiddenField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\JidField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\JidMultiField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\ListField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\ListMultiField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\Option.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\PasswordField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\RequestForm.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\ResultForm.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\SubmitForm.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\TextField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\TextMultiField.cs" />
-    <Compile Include="Extensions\XEP-0004\Dataforms\XmlCollection.cs" />
-    <Compile Include="Extensions\XEP-0020\FeatureNegotiation.cs" />
-    <Compile Include="Extensions\XEP-0030\Item.cs" />
-    <Compile Include="Extensions\XEP-0065\IPAddressExtensions.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5Bytestreams.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\ATyp.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\AuthMethod.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\AuthRequest.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\AuthResponse.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\BinaryReader.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\ByteBuilder.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\ClientGreeting.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\ReplyStatus.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\ServerGreeting.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\Socks5Client.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\Socks5Exception.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\Socks5Server.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\SocksCommand.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\SocksReply.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\SocksRequest.cs" />
-    <Compile Include="Extensions\XEP-0065\Socks5\TcpListenerExtensions.cs" />
-    <Compile Include="Extensions\XEP-0065\Streamhost.cs" />
-    <Compile Include="Extensions\XEP-0065\Stun\BindingRequest.cs" />
-    <Compile Include="Extensions\XEP-0065\Stun\BindingResponse.cs" />
-    <Compile Include="Extensions\XEP-0065\Stun\StunClient.cs" />
-    <Compile Include="Extensions\XEP-0065\UPnP\DeviceFinderCallback.cs" />
-    <Compile Include="Extensions\XEP-0065\UPnP\UPnP.cs" />
-    <Compile Include="Extensions\XEP-0077\InBandRegistration.cs" />
-    <Compile Include="Extensions\XEP-0077\RegistrationCallback.cs" />
-    <Compile Include="Extensions\XEP-0085\ChatState.cs" />
-    <Compile Include="Extensions\XEP-0085\ChatStateChangedEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0085\ChatStateNotifications.cs" />
-    <Compile Include="Extensions\XEP-0096\BytesTransferredEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0047\InBandBytestreams.cs" />
-    <Compile Include="Extensions\XEP-0084\AvatarChangedEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0084\UserAvatar.cs" />
-    <Compile Include="Extensions\XEP-0095\InitiationResult.cs" />
-    <Compile Include="Extensions\XEP-0095\StreamInitiation.cs" />
-    <Compile Include="Extensions\XEP-0096\FileMetaData.cs" />
-    <Compile Include="Extensions\XEP-0096\FileTransfer.cs" />
-    <Compile Include="Extensions\XEP-0096\FileTransferAbortedEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0096\FileTransferProgressEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0096\FileTransferRequest.cs" />
-    <Compile Include="Extensions\XEP-0096\IDataStream.cs" />
-    <Compile Include="Extensions\XEP-0096\SIFileTransfer.cs" />
-    <Compile Include="Extensions\XEP-0096\SISession.cs" />
-    <Compile Include="Extensions\XEP-0096\TransferAbortedEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0107\Mood.cs" />
-    <Compile Include="Extensions\XEP-0107\MoodChangedEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0107\UserMood.cs" />
-    <Compile Include="Extensions\XEP-0108\ActivityChangedEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0108\GeneralActivity.cs" />
-    <Compile Include="Extensions\XEP-0108\SpecificActivity.cs" />
-    <Compile Include="Extensions\XEP-0108\UserActivity.cs" />
-    <Compile Include="Extensions\XEP-0118\TuneEventArgs.cs" />
-    <Compile Include="Extensions\XEP-0118\TuneInformation.cs" />
-    <Compile Include="Extensions\XEP-0118\UserTune.cs" />
-    <Compile Include="Extensions\XEP-0163\Pep.cs" />
-    <Compile Include="Extensions\XEP-0231\BitsOfBinary.cs" />
-    <Compile Include="Extensions\XEP-0231\BobData.cs" />
-    <Compile Include="Extensions\XEP-0279\ServerIpCheck.cs" />
-    <Compile Include="Im\SubscriptionRequest.cs" />
-    <Compile Include="XmppExceptions.cs" />
-    <Compile Include="ErrorCondition.cs" />
-    <Compile Include="ErrorType.cs" />
-    <Compile Include="Core\Iq.cs" />
-    <Compile Include="Core\IqEventArgs.cs" />
-    <Compile Include="Core\IqType.cs" />
-    <Compile Include="Extensions\Extension.cs" />
-    <Compile Include="Extensions\IInputFilter.cs" />
-    <Compile Include="Extensions\IOutputFilter.cs" />
-    <Compile Include="Extensions\XEP-0030\Identity.cs" />
-    <Compile Include="Extensions\XEP-0030\ServiceDiscovery.cs" />
-    <Compile Include="Extensions\XEP-0092\SoftwareVersion.cs" />
-    <Compile Include="Extensions\XEP-0092\VersionInformation.cs" />
-    <Compile Include="Extensions\XEP-0115\EntityCapabilities.cs" />
-    <Compile Include="Extensions\XEP-0191\BlockingCommand.cs" />
-    <Compile Include="Extensions\XEP-0199\Ping.cs" />
-    <Compile Include="Extensions\XEP-0202\EntityTime.cs" />
-    <Compile Include="Extensions\XEP-0224\Attention.cs" />
-    <Compile Include="Extensions\XmppExtension.cs" />
-    <Compile Include="Im\GroupPrivacyRule.cs" />
-    <Compile Include="Im\JidPrivacyRule.cs" />
-    <Compile Include="Im\Message.cs" />
-    <Compile Include="Im\MessageEventArgs.cs" />
-    <Compile Include="Im\PrivacyGranularity.cs" />
-    <Compile Include="Im\PrivacyRule.cs" />
-    <Compile Include="Im\PrivacyList.cs" />
-    <Compile Include="Im\Roster.cs" />
-    <Compile Include="Im\RosterItem.cs" />
-    <Compile Include="Im\RosterUpdatedEventArgs.cs" />
-    <Compile Include="Im\SubscriptionApprovedEventArgs.cs" />
-    <Compile Include="Im\SubscriptionPrivacyRule.cs" />
-    <Compile Include="Im\SubscriptionRefusedEventArgs.cs" />
-    <Compile Include="Im\SubscriptionRequestEventArgs.cs" />
-    <Compile Include="Im\SubscriptionState.cs" />
-    <Compile Include="Im\UnsubscribedEventArgs.cs" />
-    <Compile Include="Im\XmlDictionary.cs" />
-    <Compile Include="Jid.cs" />
-    <Compile Include="Core\Message.cs" />
-    <Compile Include="Core\MessageEventArgs.cs" />
-    <Compile Include="Core\Presence.cs" />
-    <Compile Include="Core\PresenceEventArgs.cs" />
-    <Compile Include="Core\Sasl\Mechanisms\SaslDigestMd5.cs" />
-    <Compile Include="Core\Sasl\Mechanisms\SaslPlain.cs" />
-    <Compile Include="Core\Sasl\Mechanisms\SaslScramSha1.cs" />
-    <Compile Include="Core\Sasl\SaslException.cs" />
-    <Compile Include="Core\Sasl\SaslFactory.cs" />
-    <Compile Include="Core\Sasl\SaslMechanism.cs" />
-    <Compile Include="Core\Stanza.cs" />
-    <Compile Include="Core\StreamParser.cs" />
-    <Compile Include="Xml.cs" />
-    <Compile Include="Core\XmppCore.cs" />
-    <Compile Include="Im\Availability.cs" />
-    <Compile Include="Im\ErrorEventArgs.cs" />
-    <Compile Include="Im\MessageType.cs" />
-    <Compile Include="Im\Presence.cs" />
-    <Compile Include="Im\PresenceType.cs" />
-    <Compile Include="Im\Status.cs" />
-    <Compile Include="Im\StatusEventArgs.cs" />
-    <Compile Include="Im\XmppIm.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="XmppError.cs" />
-    <Compile Include="XmppErrorException.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="UPNPLib">
-      <Guid>{DB3442A7-A2E9-4A59-9CB5-F5C1A5D901E5}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Client\Examples.xml" />
     <Content Include="favicon.ico" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Interop.UPNPLib">
+      <HintPath>obj\Interop.UPNPLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
