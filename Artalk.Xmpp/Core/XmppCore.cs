@@ -235,6 +235,23 @@ namespace Artalk.Xmpp.Core {
 		public event EventHandler<PresenceEventArgs> Presence;
 
 		/// <summary>
+		/// The event that is raised when a stanza has been sent
+		/// </summary>
+		/// <remarks>Useful for low-level debugging</remarks>
+		public event EventHandler<StanzaXmlEventArgs> SendXml;
+
+		/// <summary>
+		/// The event that is raised when a stanza has been received
+		/// </summary>
+		/// <remarks>Useful for low-level debugging</remarks>
+		public event EventHandler<StanzaXmlEventArgs> ReceiveXml;
+
+		/// <summary>
+		/// The event that is raised when a connection was closed
+		/// </summary>
+		public event EventHandler<EventArgs> Disconnected;
+
+		/// <summary>
 		/// Initializes a new instance of the XmppCore class.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -761,7 +778,7 @@ namespace Artalk.Xmpp.Core {
 			// include this, but we make sure nonetheless.
 			Language = parser.Language ?? new CultureInfo("en");
 			// The first element of the stream must be <stream:features>.
-			return parser.NextElement("stream:features");
+			return Receive("stream:features");
 		}
 
 		/// <summary>
@@ -826,7 +843,7 @@ namespace Artalk.Xmpp.Core {
 					.Text(m.HasInitial ? m.GetResponse(String.Empty) : String.Empty);
 				Send(xml);
 				while (true) {
-					XmlElement ret = parser.NextElement("challenge", "success", "failure");
+					XmlElement ret = Receive("challenge", "success", "failure");
 					if (ret.Name == "failure")
 						throw new SaslException("SASL authentication failed.");
 					if (ret.Name == "success" && m.IsCompleted)
@@ -920,6 +937,7 @@ namespace Artalk.Xmpp.Core {
 		/// the network.</exception>
 		void Send(string xml) {
 			xml.ThrowIfNull("xml");
+			SendXml.Raise(this, new StanzaXmlEventArgs(xml));
 			// XMPP is guaranteed to be UTF-8.
 			byte[] buf = Encoding.UTF8.GetBytes(xml);
 			lock (writeLock) {
@@ -956,7 +974,7 @@ namespace Artalk.Xmpp.Core {
 		XmlElement SendAndReceive(XmlElement element,
 			params string[] expected) {
 			Send(element);
-			return parser.NextElement(expected);
+			return Receive(expected);
 		}
 
 		/// <summary>
@@ -967,7 +985,7 @@ namespace Artalk.Xmpp.Core {
 		void ReadXmlStream() {
 			try {
 				while (true) {
-					XmlElement elem = parser.NextElement("iq", "message", "presence");
+					XmlElement elem = Receive("iq", "message", "presence");
 					// Parse element and dispatch.
 					switch (elem.Name) {
 						case "iq":
@@ -996,6 +1014,15 @@ namespace Artalk.Xmpp.Core {
 				if(!disposed)
 					Error.Raise(this, new ErrorEventArgs(e));
 			}
+		}
+
+		XmlElement Receive(params string[] expected) {
+			var element = parser.NextElement(expected);
+			if (element != null) {
+				ReceiveXml.Raise(this, new StanzaXmlEventArgs(element.ToXmlString()));
+			}
+
+			return element;
 		}
 
 		/// <summary>
@@ -1060,6 +1087,7 @@ namespace Artalk.Xmpp.Core {
 			Send("</stream:stream>");
 			Connected = false;
 			Authenticated = false;
+			Disconnected.Raise(this, new EventArgs());
 		}
 	}
 }

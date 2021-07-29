@@ -201,6 +201,21 @@ namespace Artalk.Xmpp.Im {
 		public event EventHandler<ErrorEventArgs> Error;
 
 		/// <summary>
+		/// The event that is raised when a stanza has been sent.
+		/// </summary>
+		public event EventHandler<StanzaXmlEventArgs> SendXml;
+
+		/// <summary>
+		/// The event that is raised when a stanza has been received.
+		/// </summary>
+		public event EventHandler<StanzaXmlEventArgs> ReceiveXml;
+
+		/// <summary>
+		/// The event that is raised when a connection was closed.
+		/// </summary>
+		public event EventHandler<EventArgs> Disconnected;
+
+		/// <summary>
 		/// Initializes a new instance of the XmppIm.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -1385,6 +1400,15 @@ namespace Artalk.Xmpp.Im {
 			};
 			core.Error += (sender, e) => {
 				Error.Raise(sender, new ErrorEventArgs(e.Exception));
+			};
+			core.SendXml += (sender, e) => {
+				SendXml.Raise(sender, new StanzaXmlEventArgs(e.StanzaXml));
+			};
+			core.ReceiveXml += (sender, e) => {
+				ReceiveXml.Raise(sender, new StanzaXmlEventArgs(e.StanzaXml));
+			};
+			core.Disconnected += (sender, e) => {
+				Disconnected.Raise(sender, new EventArgs());
 			};
 		}
 
