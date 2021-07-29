@@ -11,21 +11,13 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		/// <remarks>This is used for compiling the list of supported extensions
 		/// advertised by the 'Service Discovery' extension.</remarks>
-		public override IEnumerable<string> Namespaces {
-			get {
-				return new string[] { "jabber:x:data" };
-			}
-		}
+		public override IEnumerable<string> Namespaces => new[] { "jabber:x:data" };
 
 		/// <summary>
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.DataForms;
-			}
-		}
+		public override string Xep => Extension.DataForms;
 
 		/// <summary>
 		/// Initializes a new instance of the DataForms class.

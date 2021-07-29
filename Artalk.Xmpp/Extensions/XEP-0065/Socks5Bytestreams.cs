@@ -61,21 +61,13 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		/// <remarks>This is used for compiling the list of supported extensions
 		/// advertised by the 'Service Discovery' extension.</remarks>
-		public override IEnumerable<string> Namespaces {
-			get {
-				return new string[] { "http://jabber.org/protocol/bytestreams" };
-			}
-		}
+		public override IEnumerable<string> Namespaces => new[] { "http://jabber.org/protocol/bytestreams" };
 
 		/// <summary>
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.Socks5Bytestreams;
-			}
-		}
+		public override string Xep => Extension.Socks5Bytestreams;
 
 		/// <summary>
 		/// The STUN server to use for determining the external IP address.

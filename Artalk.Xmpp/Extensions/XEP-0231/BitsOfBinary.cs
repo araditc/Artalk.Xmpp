@@ -22,21 +22,13 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		/// <remarks>This is used for compiling the list of supported extensions
 		/// advertised by the 'Service Discovery' extension.</remarks>
-		public override IEnumerable<string> Namespaces {
-			get {
-				return new string[] { "urn:xmpp:bob" };
-			}
-		}
+		public override IEnumerable<string> Namespaces => new[] { "urn:xmpp:bob" };
 
 		/// <summary>
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.BitsOfBinary;
-			}
-		}
+		public override string Xep => Extension.BitsOfBinary;
 
 		/// <summary>
 		/// Invoked after all extensions have been loaded.

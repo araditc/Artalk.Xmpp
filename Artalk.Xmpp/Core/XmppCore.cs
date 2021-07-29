@@ -512,7 +512,7 @@ namespace Artalk.Xmpp.Core {
 		/// network, or there was a failure reading from the network.</exception>
 		/// <exception cref="TimeoutException">A timeout was specified and it
 		/// expired.</exception>
-		public Iq IqRequest(Iq request, int millisecondsTimeout = -1) {
+		public Iq IqRequest(Iq request, int millisecondsTimeout = Timeout.Infinite) {
 			AssertValid();
 			request.ThrowIfNull("request");
 			if (request.Type != IqType.Set && request.Type != IqType.Get)
@@ -640,6 +640,8 @@ namespace Artalk.Xmpp.Core {
 		public void IqResponse(Iq response) {
 			AssertValid();
 			response.ThrowIfNull("response");
+			if (string.IsNullOrEmpty(response.Id))
+				throw new ArgumentException("The IQ response should have id equal to request.");
 			if (response.Type != IqType.Result && response.Type != IqType.Error)
 				throw new ArgumentException("The IQ type must be either 'result' or 'error'.");
 			Send(response);

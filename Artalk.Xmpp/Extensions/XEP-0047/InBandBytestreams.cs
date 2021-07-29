@@ -30,23 +30,13 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		/// <remarks>This is used for compiling the list of supported extensions
 		/// advertised by the 'Service Discovery' extension.</remarks>
-		public override IEnumerable<string> Namespaces {
-			get {
-				return new string[] {
-					"http://jabber.org/protocol/ibb"
-				};
-			}
-		}
+		public override IEnumerable<string> Namespaces => new[] { "http://jabber.org/protocol/ibb" };
 
 		/// <summary>
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.InBandBytestreams;
-			}
-		}
+		public override string Xep => Extension.InBandBytestreams;
 
 		/// <summary>
 		/// The event that is raised whenever bytes have been transferred.

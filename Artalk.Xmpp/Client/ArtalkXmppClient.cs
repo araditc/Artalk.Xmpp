@@ -1157,7 +1157,7 @@ namespace Artalk.Xmpp.Client {
 		/// <exception cref="XmppException">The server returned invalid data or another
 		/// unspecified XMPP error occurred.</exception>
 		/// <include file='Examples.xml' path='S22/Xmpp/Client/XmppClient[@name="GetFeatures"]/*'/>
-		public IEnumerable<Extension> GetFeatures(Jid jid) {
+		public IEnumerable<string> GetFeatures(Jid jid) {
 			AssertValid();
 			return ecapa.GetExtensions(jid);
 		}
@@ -1404,6 +1404,26 @@ namespace Artalk.Xmpp.Client {
 				}
 				// Get rid of unmanaged resources.
 			}
+		}
+
+		/// <summary>
+		/// Loads the specified XMPP extension.
+		/// </summary>
+		/// <typeparam name="T">The type of the extension to load.</typeparam>
+		/// <returns>An instance of the loaded extension.</returns>
+		protected T LoadExtension<T>() where T : XmppExtension {
+			return Im.LoadExtension<T>();
+		}
+
+		/// <summary>
+		/// Unloads the specified extension.
+		/// </summary>
+		/// <typeparam name="T">The type of the extension to unload.</typeparam>
+		/// <returns>true if the extension was unloaded; Otherwise false. This
+		/// method also returns false if the extension is not found in the
+		/// original list of extensions.</returns>
+		protected bool UnloadExtension<T>() where T : XmppExtension {
+			return Im.UnloadExtension<T>();
 		}
 
 		/// <summary>
