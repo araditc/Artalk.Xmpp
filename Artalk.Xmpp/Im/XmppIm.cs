@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
+using System.Threading;
 using System.Xml;
 
 namespace Artalk.Xmpp.Im {
@@ -1244,8 +1245,32 @@ namespace Artalk.Xmpp.Im {
 		/// expired.</exception>
 		internal Iq IqRequest(IqType type, Jid to = null, Jid from = null,
 			XmlElement data = null, CultureInfo language = null,
-			int millisecondsTimeout = -1) {
+			int millisecondsTimeout = Timeout.Infinite) {
 			Iq iq = new Iq(type, null, to, from, data, language);
+			return IqRequest(iq, millisecondsTimeout);
+		}
+
+		/// <summary>
+		/// Performs an IQ set/get request and blocks until the response IQ comes in.
+		/// </summary>
+		/// <param name="iq">The iq request.</param>
+		/// <param name="millisecondsTimeout">The number of milliseconds to wait
+		/// for the arrival of the IQ response or -1 to wait indefinitely.</param>
+		/// <returns>The IQ response sent by the server.</returns> 
+		/// <exception cref="ArgumentException">The iq parameter is not set.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">The value of millisecondsTimeout
+		/// is a negative number other than -1, which represents an indefinite
+		/// timeout.</exception>
+		/// <exception cref="ObjectDisposedException">The XmppIm object has been
+		/// disposed.</exception>
+		/// <exception cref="InvalidOperationException">The XmppIm instance is not
+		/// connected to a remote host.</exception>
+		/// <exception cref="IOException">There was a failure while writing to the
+		/// network.</exception>
+		/// <exception cref="TimeoutException">A timeout was specified and it
+		/// expired.</exception>
+		internal Iq IqRequest(Iq iq, int millisecondsTimeout = Timeout.Infinite) {
+			iq.ThrowIfNull(nameof(iq));
 			// Invoke IOutput<Iq> Plugins.
 			foreach (var ext in extensions) {
 				var filter = ext as IOutputFilter<Iq>;
@@ -1281,6 +1306,26 @@ namespace Artalk.Xmpp.Im {
 			XmlElement data = null, CultureInfo language = null,
 			Action<string, Iq> callback = null) {
 			Iq iq = new Iq(type, null, to, from, data, language);
+			return IqRequestAsync(iq, callback);
+		}
+
+		/// <summary>
+		/// Performs an IQ set/get request asynchronously and optionally invokes a
+		/// callback method when the IQ response comes in.
+		/// </summary>
+		/// <param name="iq">The iq request.</param>
+		/// <param name="callback">A callback method which is invoked once the
+		/// IQ response from the server comes in.</param>
+		/// <returns>The ID value of the pending IQ stanza request.</returns>
+		/// <exception cref="ArgumentException">The type parameter is not IqType.Set
+		/// or IqType.Get.</exception>
+		/// <exception cref="ObjectDisposedException">The XmppCore object has been
+		/// disposed.</exception>
+		/// <exception cref="InvalidOperationException">The XmppCore instance is not
+		/// connected to a remote host.</exception>
+		/// <exception cref="IOException">There was a failure while writing to the
+		/// network.</exception>
+		internal string IqRequestAsync(Iq iq, Action<string, Iq> callback = null) {
 			// Invoke IOutput<Iq> Plugins.
 			foreach (var ext in extensions) {
 				var filter = ext as IOutputFilter<Iq>;
@@ -1313,6 +1358,23 @@ namespace Artalk.Xmpp.Im {
 			XmlElement data = null, CultureInfo language = null) {
 			AssertValid(false);
 			Iq iq = new Iq(type, id, to, from, data, language);
+			IqResponse(iq);
+		}
+
+		/// <summary>
+		/// Sends an IQ response for the IQ request with the specified id.
+		/// </summary>
+		/// <param name="iq">The iq response.</param>
+		/// <exception cref="ArgumentException">The type parameter is not IqType.Result
+		/// or IqType.Error.</exception>
+		/// <exception cref="ObjectDisposedException">The XmppIm object has been
+		/// disposed.</exception>
+		/// <exception cref="InvalidOperationException">The XmppIm instance is not
+		/// connected to a remote host.</exception>
+		/// <exception cref="IOException">There was a failure while writing to the
+		/// network.</exception>
+		internal void IqResponse(Iq iq) {
+			AssertValid(false);
 			// Invoke IOutput<Iq> Plugins.
 			foreach (var ext in extensions) {
 				var filter = ext as IOutputFilter<Iq>;

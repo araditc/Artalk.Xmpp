@@ -24,8 +24,8 @@ namespace Artalk.Xmpp.Extensions {
 		/// <summary>
 		/// A dictionary of cached features.
 		/// </summary>
-		IDictionary<string, IEnumerable<Extension>> cachedFeatures =
-			new Dictionary<string, IEnumerable<Extension>>();
+		IDictionary<string, IEnumerable<string>> cachedFeatures =
+			new Dictionary<string, IEnumerable<string>>();
 
 		/// <summary>
 		/// The value of the 'node' attribute of the 'e' element, which should
@@ -53,11 +53,7 @@ namespace Artalk.Xmpp.Extensions {
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.EntityCapabilities;
-			}
-		}
+		public override string Xep => Extension.EntityCapabilities;
 
 		/// <summary>
 		/// Invoked after all extensions have been loaded.
@@ -112,7 +108,7 @@ namespace Artalk.Xmpp.Extensions {
 		/// <exception cref="NotSupportedException">The XMPP entity with
 		/// the specified JID does not support querying of feature
 		/// information.</exception>
-		public IEnumerable<Extension> GetExtensions(Jid jid) {
+		public IEnumerable<string> GetExtensions(Jid jid) {
 			jid.ThrowIfNull("jid");
 			if (hashes.ContainsKey(jid)) {
 				string hash = hashes[jid];
@@ -174,11 +170,11 @@ namespace Artalk.Xmpp.Extensions {
 		/// <exception cref="NotSupportedException">The XMPP entity with
 		/// the specified JID does not support querying of feature
 		/// information.</exception>
-		public bool Supports(Jid jid, params Extension[] extensions) {
+		public bool Supports(Jid jid, params string[] extensions) {
 			jid.ThrowIfNull("jid");
 			extensions.ThrowIfNull("extensions");
-			IEnumerable<Extension> supported = GetExtensions(jid);
-			foreach (Extension ext in extensions) {
+			IEnumerable<string> supported = GetExtensions(jid);
+			foreach (string ext in extensions) {
 				if (!supported.Contains(ext))
 					return false;
 			}

@@ -19,34 +19,23 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		/// <remarks>This is used for compiling the list of supported extensions
 		/// advertised by the 'Service Discovery' extension.</remarks>
-		public override IEnumerable<string> Namespaces {
-			get {
-				return new string[] {
-					"http://jabber.org/protocol/mood",
-					"http://jabber.org/protocol/mood+notify"
-				};
-			}
-		}
+		public override IEnumerable<string> Namespaces =>
+			new [] {
+				"http://jabber.org/protocol/mood",
+				"http://jabber.org/protocol/mood+notify"
+			};
 
 		/// <summary>
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.UserMood;
-			}
-		}
+		public override string Xep => Extension.UserMood;
 
 		/// <summary>
 		/// Determines whether our server supports personal eventing and thusly
 		/// the user mood extension.
 		/// </summary>
-		public bool Supported {
-			get {
-				return pep.Supported;
-			}
-		}
+		public bool Supported => pep.Supported;
 
 		/// <summary>
 		/// The event that is raised when another XMPP entity has published mood

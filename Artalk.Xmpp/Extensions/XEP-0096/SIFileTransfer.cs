@@ -50,23 +50,16 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		/// <remarks>This is used for compiling the list of supported extensions
 		/// advertised by the 'Service Discovery' extension.</remarks>
-		public override IEnumerable<string> Namespaces {
-			get {
-				return new string[] {
-					"http://jabber.org/protocol/si/profile/file-transfer"
-				};
-			}
-		}
+		public override IEnumerable<string> Namespaces =>
+			new[] {
+				"http://jabber.org/protocol/si/profile/file-transfer"
+			};
 
 		/// <summary>
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.SIFileTransfer;
-			}
-		}
+		public override string Xep => Extension.SIFileTransfer;
 
 		/// <summary>
 		/// A callback method to invoke when a request for a file-transfer is received

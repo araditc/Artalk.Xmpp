@@ -14,8 +14,8 @@ namespace Artalk.Xmpp.Extensions {
 		/// <summary>
 		/// A dictionary for caching supported services of XMPP entities.
 		/// </summary>
-		IDictionary<Jid, IEnumerable<Extension>> cache =
-			new Dictionary<Jid, IEnumerable<Extension>>();
+		IDictionary<Jid, IEnumerable<string>> cache =
+			new Dictionary<Jid, IEnumerable<string>>();
 
 		/// <summary>
 		/// An enumerable collection of XMPP namespaces the extension implements.
@@ -35,11 +35,7 @@ namespace Artalk.Xmpp.Extensions {
 		/// The named constant of the Extension enumeration that corresponds to this
 		/// extension.
 		/// </summary>
-		public override Extension Xep {
-			get {
-				return Extension.ServiceDiscovery;
-			}
-		}
+		public override string Xep => Extension.ServiceDiscovery;
 
 		/// <summary>
 		/// Returns an enumerable collection of xmlns extension namespaces supported by
@@ -124,15 +120,15 @@ namespace Artalk.Xmpp.Extensions {
 		/// parameter is null.</exception>
 		/// <exception cref="NotSupportedException">The XMPP entity with the
 		/// specified JID does not support querying of feature information.</exception>
-		public bool Supports(Jid jid, params Extension[] extensions) {
+		public bool Supports(Jid jid, params string[] extensions) {
 			jid.ThrowIfNull("jid");
 			extensions.ThrowIfNull("extensions");
 			// Have the features of the JID been cached yet?
 			if (!cache.ContainsKey(jid))
 				// Perform SDisco request and cache the result.
 				cache.Add(jid, QueryFeatures(jid));
-			IEnumerable<Extension> supported = cache[jid];
-			foreach (Extension ext in extensions) {
+			IEnumerable<string> supported = cache[jid];
+			foreach (string ext in extensions) {
 				if (!supported.Contains(ext))
 					return false;
 			}
@@ -151,7 +147,7 @@ namespace Artalk.Xmpp.Extensions {
 		/// null.</exception>
 		/// <exception cref="NotSupportedException">The XMPP entity with the
 		/// specified JID does not support querying of feature information.</exception>
-		public IEnumerable<Extension> GetExtensions(Jid jid) {
+		public IEnumerable<string> GetExtensions(Jid jid) {
 			jid.ThrowIfNull("jid");
 			if (!cache.ContainsKey(jid))
 				cache.Add(jid, QueryFeatures(jid));
@@ -223,7 +219,7 @@ namespace Artalk.Xmpp.Extensions {
 		/// is null.</exception>
 		/// <exception cref="NotSupportedException">The query could not be
 		/// performed or the response was invalid.</exception>
-		IEnumerable<Extension> QueryFeatures(Jid jid) {
+		IEnumerable<string> QueryFeatures(Jid jid) {
 			jid.ThrowIfNull("jid");
 			Iq iq = im.IqRequest(IqType.Get, jid, im.Jid,
 				Xml.Element("query", "http://jabber.org/protocol/disco#info"));
@@ -238,7 +234,7 @@ namespace Artalk.Xmpp.Extensions {
 				ns.Add(e.GetAttribute("var"));
 			// Go through each extension we support and see if the entity supports
 			// all of the extension's namespaces.
-			ISet<Extension> feats = new HashSet<Extension>();
+			ISet<string> feats = new HashSet<string>();
 			foreach (XmppExtension ext in im.Extensions) {
 				if (ns.IsSupersetOf(ext.Namespaces))
 					feats.Add(ext.Xep);
