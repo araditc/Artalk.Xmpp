@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net48;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net48;net5.0;net6.0</TargetFrameworks>
     <Authors>Arad ITC</Authors>
     <Company>Arad ITC</Company>
-    <Description>A dotnet frame work 4.8, .net core 3.1 &amp; .net 5 library for communicating with an XMPP server</Description>
+    <Description>A dotnet frame work 4.8, .net core 3.1 , .net 5 &amp; .net 6 library for communicating with an XMPP server</Description>
     <Copyright>Copyright © AradITC 2021</Copyright>
     <PackageProjectUrl>https://github.com/araditc/Artalk.Xmpp</PackageProjectUrl>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <Version>1.0.3</Version>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <Version>1.0.4</Version>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
