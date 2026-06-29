@@ -154,6 +154,34 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="KeepAlive">
+        <example>
+          This example demonstrates how to enable automatic server pings for a
+          long-running client connection.
+          <code language="c#">
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              password = "myPassword";
+
+            using (var cl = new ArtalkXmppClient(hostname, username, password)) {
+              cl.KeepAliveInterval = TimeSpan.FromMinutes(5);
+              cl.KeepAliveTimeout = TimeSpan.FromSeconds(15);
+              cl.KeepAliveFailed += (sender, e) => {
+                Console.WriteLine("Keepalive failed: " + e.Exception.Message);
+              };
+              cl.Error += (sender, e) => {
+                Console.WriteLine(e.Exception);
+              };
+              cl.Disconnected += (sender, e) => {
+                Console.WriteLine("Disconnected");
+              };
+
+              cl.Connect("long-running-client");
+              Console.ReadLine();
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="Register">
         <example>
           This example demonstrates how to register a new account with a server

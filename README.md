@@ -34,7 +34,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.2.0
+dotnet add package Artalk.Xmpp --version 2.3.0
 ```
 
 Or reference the project directly:
@@ -120,6 +120,32 @@ client.Connect("muc-sample");
 client.JoinRoom("room@conference.example.com", "my-nickname");
 client.SendRoomMessage("room@conference.example.com", "Hello room");
 ```
+
+## Keepalive And Idle Connections
+
+For long-running clients, use XEP-0199 server pings to detect or prevent idle connection loss:
+
+```csharp
+using var client = new ArtalkXmppClient("example.com", "myusername", "mypassword");
+
+client.KeepAliveInterval = TimeSpan.FromMinutes(5);
+client.KeepAliveTimeout = TimeSpan.FromSeconds(15);
+client.KeepAliveFailed += (sender, e) => {
+    Console.WriteLine($"Keepalive failed: {e.Exception.Message}");
+};
+
+client.Error += (sender, e) => {
+    Console.WriteLine(e.Exception);
+};
+
+client.Disconnected += (sender, e) => {
+    Console.WriteLine("Disconnected");
+};
+
+client.Connect("long-running-client");
+```
+
+You can also ping the connected server on demand with `PingServer()`.
 
 ## In-Band Registration
 

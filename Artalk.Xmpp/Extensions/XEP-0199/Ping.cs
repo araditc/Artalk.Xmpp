@@ -2,6 +2,7 @@
 using Artalk.Xmpp.Im;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Artalk.Xmpp.Extensions {
 	/// <summary>
@@ -72,9 +73,27 @@ namespace Artalk.Xmpp.Extensions {
 				throw new NotSupportedException("The XMPP entity does not support the " +
 					"'Ping' extension.");
 			}
+			return SendPing(jid, Timeout.Infinite);
+		}
+
+		/// <summary>
+		/// Pings the connected XMPP server.
+		/// </summary>
+		/// <param name="millisecondsTimeout">The number of milliseconds to wait for
+		/// the ping response.</param>
+		/// <returns>The time it took to ping the server.</returns>
+		/// <exception cref="TimeoutException">A timeout was specified and it
+		/// expired.</exception>
+		public TimeSpan PingServer(int millisecondsTimeout) {
+			if (millisecondsTimeout <= 0 && millisecondsTimeout != Timeout.Infinite)
+				throw new ArgumentOutOfRangeException("millisecondsTimeout");
+			return SendPing(new Jid(im.Hostname), millisecondsTimeout);
+		}
+
+		TimeSpan SendPing(Jid jid, int millisecondsTimeout) {
 			DateTime start = DateTime.Now;
 			Iq iq = im.IqRequest(IqType.Get, jid, im.Jid,
-				Xml.Element("ping", "urn:xmpp:ping"));
+				Xml.Element("ping", "urn:xmpp:ping"), null, millisecondsTimeout);
 			if (iq.Type == IqType.Error)
 				throw Util.ExceptionFromError(iq, "Could not ping XMPP entity.");
 			return DateTime.Now.Subtract(start);

@@ -1041,13 +1041,17 @@ namespace Artalk.Xmpp.Core {
 					}
 				}
 			} catch (Exception e) {
+				bool wasConnected = Connected;
+				Connected = false;
+				Authenticated = false;
 				// Shut down the dispatcher task.
 				cancelDispatch.Cancel();
 				cancelDispatch = new CancellationTokenSource();
 				// Unblock any threads blocking on pending IQ requests.
 				cancelIq.Cancel();
 				cancelIq = new CancellationTokenSource();
-				// Raise the error event.
+				if(!disposed && wasConnected)
+					Disconnected.Raise(this, new EventArgs());
 				if(!disposed)
 					Error.Raise(this, new ErrorEventArgs(e));
 			}
@@ -1081,9 +1085,8 @@ namespace Artalk.Xmpp.Core {
 				} catch(OperationCanceledException) {
 					// Quit the task if it's been cancelled.
 					return;
-				} catch(Exception) {
-					// FIXME: What should we do if an exception is thrown in one of the
-					// event handlers?
+				} catch(Exception e) {
+					Error.Raise(this, new ErrorEventArgs(e));
 				}
 			}
 		}

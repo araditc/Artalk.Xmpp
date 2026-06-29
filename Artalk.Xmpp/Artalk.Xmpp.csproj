@@ -11,13 +11,13 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <Version>2.2.0</Version>
-    <AssemblyVersion>2.2.0</AssemblyVersion>
+    <Version>2.3.0</Version>
+    <AssemblyVersion>2.3.0</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Add basic XEP-0045 multi-user chat support with room join, leave, groupchat messaging, and occupant presence events.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add XEP-0199 server ping, optional automatic keepalive pings, and clearer disconnect/error signaling for idle or interrupted streams.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

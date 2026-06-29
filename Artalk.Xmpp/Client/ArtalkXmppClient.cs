@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Security;
+using System.Threading;
 
 namespace Artalk.Xmpp.Client {
 	/// <summary>
@@ -26,6 +27,11 @@ namespace Artalk.Xmpp.Client {
 		/// and presence funcionality.
 		/// </summary>
 		XmppIm im;
+		readonly object keepAliveLock = new object();
+		Timer keepAliveTimer;
+		bool keepAliveInProgress;
+		TimeSpan keepAliveInterval = TimeSpan.Zero;
+		TimeSpan keepAliveTimeout = TimeSpan.FromSeconds(15);
 		/// <summary>
 		/// Provides access to the 'Software Version' XMPP extension functionality.
 		/// </summary>
@@ -259,6 +265,37 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// The interval for automatic XEP-0199 server pings. Set to TimeSpan.Zero
+		/// to disable automatic keepalive pings.
+		/// </summary>
+		public TimeSpan KeepAliveInterval {
+			get {
+				return keepAliveInterval;
+			}
+			set {
+				if (value < TimeSpan.Zero)
+					throw new ArgumentOutOfRangeException("KeepAliveInterval");
+				keepAliveInterval = value;
+				RestartKeepAlive();
+			}
+		}
+
+		/// <summary>
+		/// The timeout used when waiting for automatic keepalive ping responses.
+		/// </summary>
+		public TimeSpan KeepAliveTimeout {
+			get {
+				return keepAliveTimeout;
+			}
+			set {
+				if (value <= TimeSpan.Zero ||
+					value.TotalMilliseconds > Int32.MaxValue)
+					throw new ArgumentOutOfRangeException("KeepAliveTimeout");
+				keepAliveTimeout = value;
+			}
+		}
+
+		/// <summary>
 		/// The underlying XmppIm instance.
 		/// </summary>
 		public XmppIm Im {
@@ -483,6 +520,11 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// The event that is raised when an automatic keepalive ping fails.
+		/// </summary>
+		public event EventHandler<KeepAliveFailedEventArgs> KeepAliveFailed;
+
+		/// <summary>
 		/// Initializes a new instance of the XmppClient class.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -508,6 +550,7 @@ namespace Artalk.Xmpp.Client {
 			bool directTls = false) {
 				im = new XmppIm(hostname, username, password, port, tls, validate,
 					directTls);
+			im.Disconnected += (sender, e) => StopKeepAlive();
 			// Initialize the various extension modules.
 			LoadExtensions();
 		}
@@ -533,6 +576,7 @@ namespace Artalk.Xmpp.Client {
 		public ArtalkXmppClient(string hostname, int port = 5222, bool tls = true,
 			RemoteCertificateValidationCallback validate = null, bool directTls = false) {
 				im = new XmppIm(hostname, port, tls, validate, directTls);
+				im.Disconnected += (sender, e) => StopKeepAlive();
 				LoadExtensions();
 		}
 
@@ -556,6 +600,7 @@ namespace Artalk.Xmpp.Client {
 		/// of an XMPP extension failed.</exception>
 		public void Connect(string resource = null) {
 			im.Connect(resource);
+			RestartKeepAlive();
 		}
 
 		/// <summary>
@@ -580,6 +625,7 @@ namespace Artalk.Xmpp.Client {
 		/// of an XMPP extension failed.</exception>
 		public void Authenticate(string username, string password) {
 			im.Authenticate(username, password);
+			RestartKeepAlive();
 		}
 
 		/// <summary>
@@ -1311,6 +1357,17 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// Pings the connected XMPP server using XEP-0199.
+		/// </summary>
+		/// <param name="millisecondsTimeout">The number of milliseconds to wait for
+		/// the ping response.</param>
+		/// <returns>The time it took to ping the server.</returns>
+		public TimeSpan PingServer(int millisecondsTimeout = 15000) {
+			AssertValid();
+			return ping.PingServer(millisecondsTimeout);
+		}
+
+		/// <summary>
 		/// Blocks all communication to and from the XMPP entity with the specified JID.
 		/// </summary>
 		/// <param name="jid">The JID of the XMPP entity to block.</param>
@@ -1493,6 +1550,7 @@ namespace Artalk.Xmpp.Client {
 				disposed = true;
 				// Get rid of managed resources.
 				if (disposing) {
+					StopKeepAlive();
 					if (im != null)
 						im.Close();
 					im = null;
@@ -1567,6 +1625,42 @@ namespace Artalk.Xmpp.Client {
 			inBandRegistration = im.LoadExtension<InBandRegistration>();
 			chatStateNotifications = im.LoadExtension<ChatStateNotifications>();
 			bitsOfBinary = im.LoadExtension<BitsOfBinary>();
+		}
+
+		void RestartKeepAlive() {
+			StopKeepAlive();
+			if (disposed || !Connected || !Authenticated ||
+				KeepAliveInterval == TimeSpan.Zero)
+				return;
+			keepAliveTimer = new Timer(KeepAliveCallback, null,
+				KeepAliveInterval, KeepAliveInterval);
+		}
+
+		void StopKeepAlive() {
+			lock (keepAliveLock) {
+				if (keepAliveTimer != null) {
+					keepAliveTimer.Dispose();
+					keepAliveTimer = null;
+				}
+				keepAliveInProgress = false;
+			}
+		}
+
+		void KeepAliveCallback(object state) {
+			lock (keepAliveLock) {
+				if (keepAliveInProgress || disposed || !Connected || !Authenticated)
+					return;
+				keepAliveInProgress = true;
+			}
+			try {
+				PingServer((int) KeepAliveTimeout.TotalMilliseconds);
+			} catch (Exception e) {
+				KeepAliveFailed.Raise(this, new KeepAliveFailedEventArgs(e));
+			} finally {
+				lock (keepAliveLock) {
+					keepAliveInProgress = false;
+				}
+			}
 		}
 	}
 }

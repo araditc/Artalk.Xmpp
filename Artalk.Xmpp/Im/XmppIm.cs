@@ -1137,8 +1137,12 @@ namespace Artalk.Xmpp.Im {
 				disposed = true;
 				// Get rid of managed resources.
 				if (disposing) {
-					if (core != null)
-						core.Close();
+					if (core != null) {
+						if (core.Connected)
+							core.Close();
+						else
+							core.Dispose();
+					}
 					core = null;
 				}
 				// Get rid of unmanaged resources.
