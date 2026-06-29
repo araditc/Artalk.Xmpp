@@ -520,23 +520,32 @@ namespace Artalk.Xmpp.Core {
 			// Generate a unique ID for the IQ request.
 			request.Id = GetId();
 			AutoResetEvent ev = new AutoResetEvent(false);
-			Send(request);
-			// Wait for event to be signaled by task that processes the incoming
-			// XML stream.
 			waitHandles[request.Id] = ev;
-			int index = WaitHandle.WaitAny(new WaitHandle[] { ev, cancelIq.Token.WaitHandle },
-				millisecondsTimeout);
-			if (index == WaitHandle.WaitTimeout)
-				throw new TimeoutException();
-			// Reader task errored out.
-			if (index == 1)
-				throw new IOException("The incoming XML stream could not read.");
-			// Fetch response stanza.
-			Iq response;
-			if (iqResponses.TryRemove(request.Id, out response))
-				return response;
-			// Shouldn't happen.
-			throw new InvalidOperationException();
+			try {
+				Send(request);
+				// Wait for event to be signaled by task that processes the incoming
+				// XML stream.
+				int index = WaitHandle.WaitAny(
+					new WaitHandle[] { ev, cancelIq.Token.WaitHandle },
+					millisecondsTimeout);
+				if (index == WaitHandle.WaitTimeout)
+					throw new TimeoutException();
+				// Reader task errored out.
+				if (index == 1)
+					throw new IOException("The incoming XML stream could not read.");
+				// Fetch response stanza.
+				Iq response;
+				if (iqResponses.TryRemove(request.Id, out response))
+					return response;
+				// Shouldn't happen.
+				throw new InvalidOperationException();
+			} finally {
+				AutoResetEvent removed;
+				if (waitHandles.TryRemove(request.Id, out removed))
+					removed.Dispose();
+				else
+					ev.Dispose();
+			}
 		}
 
 		/// <summary>
@@ -807,8 +816,7 @@ namespace Artalk.Xmpp.Core {
 			SendAndReceive(Xml.Element("starttls",
 				"urn:ietf:params:xml:ns:xmpp-tls"), "proceed");
 			// Complete TLS negotiation and switch to secure stream.
-			SslStream sslStream = new SslStream(stream, false, validate ??
-				((sender, cert, chain, err) => true));
+			SslStream sslStream = new SslStream(stream, false, validate);
 			sslStream.AuthenticateAsClient(hostname);
 			stream = sslStream;
 			IsEncrypted = true;
@@ -1046,7 +1054,7 @@ namespace Artalk.Xmpp.Core {
 				} catch(OperationCanceledException) {
 					// Quit the task if it's been cancelled.
 					return;
-				} catch(Exception e) {
+				} catch(Exception) {
 					// FIXME: What should we do if an exception is thrown in one of the
 					// event handlers?
 				}
@@ -1061,10 +1069,11 @@ namespace Artalk.Xmpp.Core {
 			string id = iq.Id;
 			AutoResetEvent ev;
 			Action<string, Iq> cb;
-			iqResponses[id] = iq;
 			// Signal the event if it's a blocking call.
-			if (waitHandles.TryRemove(id, out ev))
+			if (waitHandles.TryRemove(id, out ev)) {
+				iqResponses[id] = iq;
 				ev.Set();
+			}
 			// Call the callback if it's an asynchronous call.
 			else if (iqCallbacks.TryRemove(id, out cb))
 				Task.Factory.StartNew(() => { cb(id, iq); });

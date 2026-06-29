@@ -276,10 +276,8 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 		private byte[] Hi(string password, string salt, int count) {
 			// The salt is sent by the server as a base64-encoded string.
 			byte[] saltBytes = Convert.FromBase64String(salt);
-			using (var db = new Rfc2898DeriveBytes(password, saltBytes, count)) {
-				// Generate 20 key bytes, which is the size of the hash result of SHA-1.
-				return db.GetBytes(20);
-			}
+			return Rfc2898DeriveBytes.Pbkdf2(password, saltBytes, count,
+				HashAlgorithmName.SHA1, 20);
 		}
 
 		/// <summary>
@@ -315,7 +313,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 		/// <param name="data">The data array to apply the hash function to.</param>
 		/// <returns>The hash value for the specified byte array.</returns>
 		private byte[] H(byte[] data) {
-			using (var sha1 = new SHA1Managed()) {
+			using (var sha1 = SHA1.Create()) {
 				return sha1.ComputeHash(data);
 			}
 		}

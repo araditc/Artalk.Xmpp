@@ -451,7 +451,7 @@ namespace Artalk.Xmpp.Extensions {
 				// Perform the actual data-transfer.
 				try {
 					ext.Transfer(session);
-				} catch(Exception e) {
+				} catch(Exception) {
 					// Nothing to do here.
 				}
 			} catch {

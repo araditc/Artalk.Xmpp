@@ -264,7 +264,7 @@ namespace Artalk.Xmpp.Extensions.Socks5 {
 			stream.Write(bytes, 0, bytes.Length);
 			// Read the server's response.
 			bytes = new byte[2];
-			stream.Read(bytes, 0, 2);
+			ReadExactly(bytes, 0, 2);
 			return ServerGreeting.Deserialize(bytes);
 		}
 
@@ -278,10 +278,20 @@ namespace Artalk.Xmpp.Extensions.Socks5 {
 			stream.Write(bytes, 0, bytes.Length);
 			// Read the server's response.
 			bytes = new byte[2];
-			stream.Read(bytes, 0, 2);
+			ReadExactly(bytes, 0, 2);
 			AuthResponse response = AuthResponse.Deserialize(bytes);
 			if (!response.Success)
 				throw new Socks5Exception("Authentication failed.");
+		}
+
+		void ReadExactly(byte[] buffer, int offset, int count) {
+			while (count > 0) {
+				int read = stream.Read(buffer, offset, count);
+				if (read == 0)
+					throw new Socks5Exception("The SOCKS5 server closed the connection.");
+				offset += read;
+				count -= read;
+			}
 		}
 
 		/// <summary>

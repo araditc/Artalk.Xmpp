@@ -526,7 +526,7 @@ namespace Artalk.Xmpp.Client {
 		/// XML stream with the server, or resource binding failed, or the initialization
 		/// of an XMPP extension failed.</exception>
 		public void Authenticate(string username, string password) {
-			im.Autenticate(username, password);
+			im.Authenticate(username, password);
 		}
 
 		/// <summary>

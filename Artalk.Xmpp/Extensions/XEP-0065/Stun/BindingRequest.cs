@@ -17,12 +17,6 @@ namespace Artalk.Xmpp.Extensions.Stun {
 		/// </summary>
 		readonly byte[] magicCookie = new byte[] { 0x21, 0x12, 0xA4, 0x42 };
 		/// <summary>
-		/// The crypto provider for generating random transaction ids.
-		/// </summary>
-		static RNGCryptoServiceProvider cryptoProvider =
-			new RNGCryptoServiceProvider();
-
-		/// <summary>
 		/// The transaction id of the binding request.
 		/// </summary>
 		public byte[] Id {
@@ -62,8 +56,7 @@ namespace Artalk.Xmpp.Extensions.Stun {
 				}
 				Id = id;
 			} else {
-				Id = new byte[12];
-				cryptoProvider.GetBytes(Id);
+				Id = RandomNumberGenerator.GetBytes(12);
 			}
 		}
 	}

@@ -229,7 +229,7 @@ namespace Artalk.Xmpp.Extensions {
 			foreach(string xmlns in list)
 				s.Append(xmlns + "<");
 			byte[] bytes = Encoding.UTF8.GetBytes(s.ToString());
-			using (var sha1 = new SHA1Managed())
+			using (var sha1 = SHA1.Create())
 				return Convert.ToBase64String(sha1.ComputeHash(bytes));
 		}
 
@@ -262,11 +262,11 @@ namespace Artalk.Xmpp.Extensions {
 			algorithm.ThrowIfNull("algorithm");
 			var dict = new Dictionary<string, Func<HashAlgorithm>>
 				(StringComparer.InvariantCultureIgnoreCase) {
-				{ "sha-1",   () => new SHA1Managed() },
-				{ "sha-256", () => new SHA256Managed() },
-				{ "sha-384", () => new SHA384Managed() },
-				{ "sha-512", () => new SHA512Managed() },
-				{ "md5",     () => new MD5CryptoServiceProvider() },
+				{ "sha-1",   () => SHA1.Create() },
+				{ "sha-256", () => SHA256.Create() },
+				{ "sha-384", () => SHA384.Create() },
+				{ "sha-512", () => SHA512.Create() },
+				{ "md5",     () => MD5.Create() },
 			};
 			return dict.ContainsKey(algorithm) ? dict[algorithm].Invoke() : null;
 		}

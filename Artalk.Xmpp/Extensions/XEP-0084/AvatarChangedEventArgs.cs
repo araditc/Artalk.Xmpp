@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+using System;
 
 namespace Artalk.Xmpp.Extensions {
 	/// <summary>
@@ -20,7 +19,7 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		public bool Cleared {
 			get {
-				return Avatar == null;
+				return AvatarData == null || AvatarData.Length == 0;
 			}
 		}
 
@@ -33,9 +32,17 @@ namespace Artalk.Xmpp.Extensions {
 		}
 
 		/// <summary>
-		/// The image representing the XMPP entity's avatar.
+		/// The MIME type of the avatar data.
 		/// </summary>
-		public Image Avatar {
+		public string MimeType {
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// The binary avatar payload.
+		/// </summary>
+		public byte[] AvatarData {
 			get;
 			private set;
 		}
@@ -46,15 +53,17 @@ namespace Artalk.Xmpp.Extensions {
 		/// <param name="jid">The JID of the XMPP entity that published the
 		/// avatar information.</param>
 		/// <param name="hash">The SHA-1 hash of the avatar image data.</param>
-		/// <param name="avatar">The avatar information to include as part of
-		/// the event.</param>
+		/// <param name="avatarData">The avatar binary payload.</param>
+		/// <param name="mimeType">The MIME type of the avatar payload.</param>
 		/// <exception cref="ArgumentNullException">The jid parameter is
 		/// null.</exception>
-		public AvatarChangedEventArgs(Jid jid, string hash = null, Image avatar = null) {
+		public AvatarChangedEventArgs(Jid jid, string hash = null,
+			byte[] avatarData = null, string mimeType = null) {
 			jid.ThrowIfNull("jid");
 			Jid = jid;
 			Hash = hash;
-			Avatar = avatar;
+			AvatarData = avatarData;
+			MimeType = mimeType;
 		}
 	}
 }

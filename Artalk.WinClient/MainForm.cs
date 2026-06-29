@@ -1,10 +1,12 @@
 ﻿using Artalk.Xmpp.Client;
 using Artalk.Xmpp.Im;
 using System;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace Artalk.WinClient
 {
+    [SupportedOSPlatform("windows")]
     public partial class MainForm : Form
     {
         ArtalkXmppClient client;

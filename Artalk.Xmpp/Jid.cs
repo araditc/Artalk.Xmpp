@@ -65,7 +65,7 @@ namespace Artalk.Xmpp {
 		public Jid(string jid) {
 			jid.ThrowIfNullOrEmpty("jid");
 			Match m = Regex.Match(jid,
-				"(?:(?<node>[^@]+)@)?(?<domain>[^/]+)(?:/(?<resource>.+))?");
+				"^(?:(?<node>[^@/]+)@)?(?<domain>[^@/]+)(?:/(?<resource>.+))?$");
 			if (!m.Success)
 				throw new ArgumentException("The argument is not a valid JID.");
 			Domain = m.Groups["domain"].Value;

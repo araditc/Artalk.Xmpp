@@ -116,7 +116,7 @@ namespace Artalk.Xmpp.Extensions {
 		/// null.</exception>
 		string Sha1(byte[] data) {
 			data.ThrowIfNull("data");
-			using (var sha1 = new SHA1Managed()) {
+			using (var sha1 = SHA1.Create()) {
 				byte[] hash = sha1.ComputeHash(data);
 				StringBuilder builder = new StringBuilder();
 				foreach (byte h in hash)

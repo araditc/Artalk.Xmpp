@@ -78,7 +78,8 @@ namespace Artalk.Xmpp.Core {
 		/// has been encountered and the server has closed the connection.</exception>
 		public XmlElement NextElement(params string[] expected) {
 			// Advance reader to next node.
-			reader.Read();
+			if (!reader.Read())
+				throw new IOException("The server has closed the XML stream.");
 			if (reader.NodeType == XmlNodeType.EndElement && reader.Name ==
 				"stream:stream")
 				throw new IOException("The server has closed the XML stream.");

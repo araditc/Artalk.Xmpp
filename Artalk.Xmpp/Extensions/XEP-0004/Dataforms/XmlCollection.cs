@@ -99,10 +99,15 @@ namespace Artalk.Xmpp.Extensions.Dataforms {
 		/// System.Array must have zero-based indexing.</param>
 		/// <param name="arrayIndex">The zero-based index in array at which copying
 		/// begins.</param>
-		/// <exception cref="NotImplementedException">The method is not
-		/// implemented.</exception>
 		public void CopyTo(T[] array, int arrayIndex) {
-			throw new NotImplementedException();
+			array.ThrowIfNull("array");
+			if (arrayIndex < 0 || arrayIndex > array.Length)
+				throw new ArgumentOutOfRangeException("arrayIndex");
+			foreach (var item in GetItems()) {
+				if (arrayIndex >= array.Length)
+					throw new ArgumentException("The destination array is too small.");
+				array[arrayIndex++] = item;
+			}
 		}
 
 		/// <summary>

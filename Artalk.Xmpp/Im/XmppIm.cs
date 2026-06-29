@@ -329,7 +329,7 @@ namespace Artalk.Xmpp.Im {
 		/// <exception cref="XmppException">An XMPP error occurred while negotiating the
 		/// XML stream with the server, or resource binding failed, or the initialization
 		/// of an XMPP extension failed.</exception>
-		public void Autenticate(string username, string password) {
+		public void Authenticate(string username, string password) {
 			username.ThrowIfNull("username");
 			password.ThrowIfNull("password");
 			core.Authenticate(username, password);
@@ -339,6 +339,17 @@ namespace Artalk.Xmpp.Im {
 			Roster roster = GetRoster();
 			// Send initial presence.
 			SendPresence(new Presence());
+		}
+
+		/// <summary>
+		/// Authenticates with the XMPP server using the specified username and
+		/// password.
+		/// </summary>
+		/// <param name="username">The username to authenticate with.</param>
+		/// <param name="password">The password to authenticate with.</param>
+		[Obsolete("Use Authenticate instead.")]
+		public void Autenticate(string username, string password) {
+			Authenticate(username, password);
 		}
 
 		/// <summary>

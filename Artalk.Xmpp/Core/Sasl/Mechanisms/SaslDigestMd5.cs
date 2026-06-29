@@ -222,7 +222,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			Encoding enc = Encoding.GetEncoding("ISO-8859-1");
 			string ncValue = "00000001", realm = challenge["realm"];
 			// Construct A1.
-			using (var md5p = new MD5CryptoServiceProvider()) {
+			using (var md5p = System.Security.Cryptography.MD5.Create()) {
 				byte[] data = enc.GetBytes(username + ":" + realm + ":" + password);
 				data = md5p.ComputeHash(data);
 				string A1 = enc.GetString(data) + ":" + challenge["nonce"] + ":" +
@@ -253,7 +253,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			if (encoding == null)
 				encoding = Encoding.UTF8;
 			byte[] data = encoding.GetBytes(s);
-			byte[] hash = (new MD5CryptoServiceProvider()).ComputeHash(data);
+			byte[] hash = System.Security.Cryptography.MD5.HashData(data);
 			StringBuilder builder = new StringBuilder();
 			foreach (byte h in hash)
 				builder.Append(h.ToString("x2"));
