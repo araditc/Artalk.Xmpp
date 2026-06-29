@@ -14,7 +14,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 
 - TCP XML streams
 - STARTTLS and direct TLS
-- SASL authentication: SCRAM-SHA-256, SCRAM-SHA-1, DIGEST-MD5, PLAIN
+- SASL authentication: SCRAM-SHA3-512, SCRAM-SHA-512, SCRAM-SHA-384, SCRAM-SHA-256, SCRAM-SHA-224, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
 - Multi-user chat basics: join, leave, groupchat messages, and occupant presence
@@ -34,7 +34,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.3.0
+dotnet add package Artalk.Xmpp --version 2.4.0
 ```
 
 Or reference the project directly:
@@ -166,6 +166,8 @@ client.Register(form => new SubmitForm(
 ## Security Notes
 
 STARTTLS now uses the platform certificate validator by default. If a server requires custom certificate validation, pass a `RemoteCertificateValidationCallback` to the client constructor.
+
+SCRAM `-PLUS` channel-binding variants are not advertised yet because the library does not expose TLS channel binding data to the SASL layer.
 
 When a server advertises legacy XMPP session establishment, Artalk.Xmpp completes it. Modern servers that omit the legacy session feature are no longer rejected during sign-in.
 

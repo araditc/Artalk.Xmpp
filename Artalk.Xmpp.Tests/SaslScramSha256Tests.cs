@@ -36,4 +36,32 @@ public sealed class SaslScramSha256Tests {
 		Assert.AreEqual("SCRAM-SHA-256", mechanism.Name);
 		Assert.IsTrue(mechanism.HasInitial);
 	}
+
+	[TestMethod]
+	public void Sha224ProducesExpectedDigest() {
+		byte[] digest = Sha224.HashData(Encoding.ASCII.GetBytes("abc"));
+
+		Assert.AreEqual(
+			"23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
+			Convert.ToHexString(digest).ToLowerInvariant());
+	}
+
+	[TestMethod]
+	public void FactoryCanCreateAllScramMechanisms() {
+		string[] names = {
+			"SCRAM-SHA3-512",
+			"SCRAM-SHA-512",
+			"SCRAM-SHA-384",
+			"SCRAM-SHA-256",
+			"SCRAM-SHA-224",
+			"SCRAM-SHA-1"
+		};
+
+		foreach (string name in names) {
+			SaslMechanism mechanism = SaslFactory.Create(name);
+
+			Assert.AreEqual(name, mechanism.Name);
+			Assert.IsTrue(mechanism.HasInitial);
+		}
+	}
 }

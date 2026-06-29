@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
@@ -10,9 +9,9 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 	/// </summary>
 	internal abstract class SaslScram : SaslMechanism {
 		readonly string mechanismName;
-		readonly HashAlgorithmName hashAlgorithm;
 		readonly int hashLength;
-		readonly Func<byte[], HMAC> hmacFactory;
+		readonly Func<byte[], byte[], byte[]> hmac;
+		readonly Func<byte[], byte[]> hash;
 
 		bool completed;
 		string cnonce = GenerateCnonce();
@@ -61,27 +60,28 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			}
 		}
 
-		protected SaslScram(string mechanismName, HashAlgorithmName hashAlgorithm,
-			int hashLength, Func<byte[], HMAC> hmacFactory) {
+		protected SaslScram(string mechanismName, int hashLength,
+			Func<byte[], byte[], byte[]> hmac, Func<byte[], byte[]> hash) {
 			mechanismName.ThrowIfNullOrEmpty("mechanismName");
-			hmacFactory.ThrowIfNull("hmacFactory");
+			hmac.ThrowIfNull("hmac");
+			hash.ThrowIfNull("hash");
 			this.mechanismName = mechanismName;
-			this.hashAlgorithm = hashAlgorithm;
 			this.hashLength = hashLength;
-			this.hmacFactory = hmacFactory;
+			this.hmac = hmac;
+			this.hash = hash;
 		}
 
-		protected SaslScram(string mechanismName, HashAlgorithmName hashAlgorithm,
-			int hashLength, Func<byte[], HMAC> hmacFactory, string username,
-			string password) : this(mechanismName, hashAlgorithm, hashLength,
-			hmacFactory) {
+		protected SaslScram(string mechanismName, int hashLength,
+			Func<byte[], byte[], byte[]> hmac, Func<byte[], byte[]> hash,
+			string username, string password) : this(mechanismName, hashLength,
+			hmac, hash) {
 			SetCredentials(username, password);
 		}
 
-		protected SaslScram(string mechanismName, HashAlgorithmName hashAlgorithm,
-			int hashLength, Func<byte[], HMAC> hmacFactory, string username,
-			string password, string cnonce) : this(mechanismName, hashAlgorithm,
-			hashLength, hmacFactory, username, password) {
+		protected SaslScram(string mechanismName, int hashLength,
+			Func<byte[], byte[], byte[]> hmac, Func<byte[], byte[]> hash,
+			string username, string password, string cnonce) : this(mechanismName,
+			hashLength, hmac, hash, username, password) {
 			cnonce.ThrowIfNullOrEmpty("cnonce");
 			this.cnonce = cnonce;
 		}
@@ -172,14 +172,25 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 
 		byte[] Hi(string password, string salt, int count) {
 			byte[] saltBytes = Convert.FromBase64String(salt);
-			return Rfc2898DeriveBytes.Pbkdf2(password, saltBytes, count,
-				hashAlgorithm, hashLength);
+			byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+			byte[] block = new byte[saltBytes.Length + 4];
+			Buffer.BlockCopy(saltBytes, 0, block, 0, saltBytes.Length);
+			block[block.Length - 1] = 1;
+
+			byte[] u = ComputeHmac(passwordBytes, block);
+			byte[] output = (byte[]) u.Clone();
+			for (int i = 1; i < count; i++) {
+				u = ComputeHmac(passwordBytes, u);
+				for (int j = 0; j < output.Length; j++)
+					output[j] = (byte) (output[j] ^ u[j]);
+			}
+			if (output.Length == hashLength)
+				return output;
+			return output.Take(hashLength).ToArray();
 		}
 
 		byte[] ComputeHmac(byte[] key, byte[] data) {
-			using (var hmac = hmacFactory(key)) {
-				return hmac.ComputeHash(data);
-			}
+			return hmac(key, data);
 		}
 
 		byte[] ComputeHmac(byte[] key, string data) {
@@ -187,12 +198,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 		}
 
 		byte[] ComputeHash(byte[] data) {
-			if (hashAlgorithm == HashAlgorithmName.SHA1)
-				return SHA1.HashData(data);
-			if (hashAlgorithm == HashAlgorithmName.SHA256)
-				return SHA256.HashData(data);
-			throw new NotSupportedException("Unsupported SCRAM hash algorithm: " +
-				hashAlgorithm.Name);
+			return hash(data);
 		}
 
 		byte[] Xor(byte[] a, byte[] b) {

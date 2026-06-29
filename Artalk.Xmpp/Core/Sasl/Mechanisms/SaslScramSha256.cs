@@ -6,18 +6,23 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 	/// </summary>
 	internal class SaslScramSha256 : SaslScram {
 		private SaslScramSha256()
-			: base("SCRAM-SHA-256", HashAlgorithmName.SHA256, 32,
-				key => new HMACSHA256(key)) {
+			: base("SCRAM-SHA-256", 32, ComputeHmac, SHA256.HashData) {
 		}
 
 		internal SaslScramSha256(string username, string password, string cnonce)
-			: base("SCRAM-SHA-256", HashAlgorithmName.SHA256, 32,
-				key => new HMACSHA256(key), username, password, cnonce) {
+			: base("SCRAM-SHA-256", 32, ComputeHmac, SHA256.HashData, username,
+				password, cnonce) {
 		}
 
 		public SaslScramSha256(string username, string password)
-			: base("SCRAM-SHA-256", HashAlgorithmName.SHA256, 32,
-				key => new HMACSHA256(key), username, password) {
+			: base("SCRAM-SHA-256", 32, ComputeHmac, SHA256.HashData, username,
+				password) {
+		}
+
+		static byte[] ComputeHmac(byte[] key, byte[] data) {
+			using (var hmac = new HMACSHA256(key)) {
+				return hmac.ComputeHash(data);
+			}
 		}
 	}
 }

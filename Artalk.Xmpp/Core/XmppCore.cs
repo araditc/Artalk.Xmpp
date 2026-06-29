@@ -915,8 +915,16 @@ namespace Artalk.Xmpp.Core {
 		/// <exception cref="SaslException">No supported mechanism could be found in
 		/// the list of mechanisms advertised by the server.</exception>
 		string SelectMechanism(IEnumerable<string> mechanisms) {
-			// Precedence: SCRAM-SHA-256, SCRAM-SHA-1, DIGEST-MD5, PLAIN.
-			string[] m = new string[] { "SCRAM-SHA-256", "SCRAM-SHA-1", "DIGEST-MD5", "PLAIN" };
+			string[] m = new string[] {
+				"SCRAM-SHA3-512",
+				"SCRAM-SHA-512",
+				"SCRAM-SHA-384",
+				"SCRAM-SHA-256",
+				"SCRAM-SHA-224",
+				"SCRAM-SHA-1",
+				"DIGEST-MD5",
+				"PLAIN"
+			};
 			for (int i = 0; i < m.Length; i++) {
 				if (mechanisms.Contains(m[i], StringComparer.InvariantCultureIgnoreCase))
 					return m[i];
