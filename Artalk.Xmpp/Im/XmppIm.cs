@@ -116,6 +116,19 @@ namespace Artalk.Xmpp.Im {
 		}
 
 		/// <summary>
+		/// The BOSH connection manager URL. If this is set, the client connects
+		/// through XMPP over BOSH instead of a TCP XML stream.
+		/// </summary>
+		public Uri BoshUrl {
+			get {
+				return core.BoshUrl;
+			}
+			set {
+				core.BoshUrl = value;
+			}
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -265,6 +278,19 @@ namespace Artalk.Xmpp.Im {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the XmppIm class for XMPP over BOSH.
+		/// </summary>
+		/// <param name="boshUrl">The BOSH connection manager URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="username">The username with which to authenticate.</param>
+		/// <param name="password">The password with which to authenticate.</param>
+		public XmppIm(Uri boshUrl, string hostname, string username,
+			string password) {
+			core = new XmppCore(boshUrl, hostname, username, password);
+			SetupEventHandlers();
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the XmppIm.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -283,6 +309,17 @@ namespace Artalk.Xmpp.Im {
 		public XmppIm(string hostname, int port = 5222, bool tls = true,
 			RemoteCertificateValidationCallback validate = null, bool directTls = false) {
 			core = new XmppCore(hostname, port, tls, validate, directTls);
+			SetupEventHandlers();
+		}
+
+		/// <summary>
+		/// Initializes a new unauthenticated instance of the XmppIm class for XMPP
+		/// over BOSH.
+		/// </summary>
+		/// <param name="boshUrl">The BOSH connection manager URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		public XmppIm(Uri boshUrl, string hostname) {
+			core = new XmppCore(boshUrl, hostname);
 			SetupEventHandlers();
 		}
 

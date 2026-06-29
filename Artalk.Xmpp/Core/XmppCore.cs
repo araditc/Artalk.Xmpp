@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -27,6 +28,9 @@ namespace Artalk.Xmpp.Core {
 		/// The (network) stream used for sending and receiving XML data.
 		/// </summary>
 		Stream stream;
+		BoshTransport bosh;
+		readonly HttpMessageHandler boshMessageHandler;
+		bool boshStreamOpened;
 		/// <summary>
 		/// The parser instance used for parsing incoming XMPP XML-stream data.
 		/// </summary>
@@ -174,6 +178,15 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		/// <summary>
+		/// The BOSH connection manager URL. If this is set, the client connects
+		/// through XMPP over BOSH instead of a TCP XML stream.
+		/// </summary>
+		public Uri BoshUrl {
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -299,6 +312,18 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the XmppCore class for XMPP over BOSH.
+		/// </summary>
+		/// <param name="boshUrl">The BOSH connection manager URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="username">The username with which to authenticate.</param>
+		/// <param name="password">The password with which to authenticate.</param>
+		public XmppCore(Uri boshUrl, string hostname, string username,
+			string password) : this(hostname, username, password) {
+			BoshUrl = boshUrl;
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the XmppCore class.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -324,6 +349,22 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the XmppCore class for unauthenticated
+		/// XMPP over BOSH.
+		/// </summary>
+		/// <param name="boshUrl">The BOSH connection manager URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		public XmppCore(Uri boshUrl, string hostname) : this(hostname) {
+			BoshUrl = boshUrl;
+		}
+
+		internal XmppCore(Uri boshUrl, string hostname, string username,
+			string password, HttpMessageHandler boshMessageHandler)
+			: this(boshUrl, hostname, username, password) {
+			this.boshMessageHandler = boshMessageHandler;
+		}
+
+		/// <summary>
 		/// Establishes a connection to the XMPP server.
 		/// </summary>
 		/// <param name="resource">The resource identifier to bind with. If this is null,
@@ -346,11 +387,17 @@ namespace Artalk.Xmpp.Core {
 				throw new ObjectDisposedException(GetType().FullName);
 			this.resource = resource;
 			try {
-				client = new TcpClient(Hostname, Port);
-				stream = client.GetStream();
-				IsEncrypted = false;
+				if (BoshUrl != null) {
+					bosh = new BoshTransport(BoshUrl, Hostname, boshMessageHandler);
+					boshStreamOpened = false;
+					IsEncrypted = bosh.IsEncrypted;
+				} else {
+					client = new TcpClient(Hostname, Port);
+					stream = client.GetStream();
+					IsEncrypted = false;
+				}
 				SessionSupported = false;
-				if (DirectTls)
+				if (DirectTls && bosh == null)
 					SecureStream(Hostname, Validate);
 				// Sets up the connection which includes TLS and possibly SASL negotiation.
 				SetupConnection(this.resource);
@@ -717,6 +764,9 @@ namespace Artalk.Xmpp.Core {
 					if (parser != null)
 						parser.Close();
 					parser = null;
+					if (bosh != null)
+						bosh.Dispose();
+					bosh = null;
 					if (client != null)
 						client.Close();
 					client = null;
@@ -752,7 +802,7 @@ namespace Artalk.Xmpp.Core {
 			// Request the initial stream.
 			XmlElement feats = InitiateStream(Hostname);
 			// Server supports TLS/SSL via STARTTLS.
-			if (feats["starttls"] != null && !IsEncrypted) {
+			if (bosh == null && feats["starttls"] != null && !IsEncrypted) {
 				// TLS is mandatory and user opted out of it.
 				if (feats["starttls"]["required"] != null && Tls == false)
 					throw new AuthenticationException("The server requires TLS/SSL.");
@@ -799,6 +849,12 @@ namespace Artalk.Xmpp.Core {
 		/// <exception cref="IOException">There was a failure while writing to the
 		/// network, or there was a failure while reading from the network.</exception>
 		XmlElement InitiateStream(string hostname) {
+			if (bosh != null) {
+				XmlElement feats = boshStreamOpened ? bosh.Restart() : bosh.Open();
+				boshStreamOpened = true;
+				Language = bosh.Language ?? new CultureInfo("en");
+				return feats;
+			}
 			var xml = Xml.Element("stream:stream", "jabber:client")
 				.Attr("to", hostname)
 				.Attr("version", "1.0")
@@ -983,6 +1039,10 @@ namespace Artalk.Xmpp.Core {
 		void Send(string xml) {
 			xml.ThrowIfNull("xml");
 			SendXml.Raise(this, new StanzaXmlEventArgs(xml));
+			if (bosh != null) {
+				bosh.Send(xml);
+				return;
+			}
 			// XMPP is guaranteed to be UTF-8.
 			byte[] buf = Encoding.UTF8.GetBytes(xml);
 			lock (writeLock) {
@@ -1066,7 +1126,8 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		XmlElement Receive(params string[] expected) {
-			var element = parser.NextElement(expected);
+			var element = bosh != null ? bosh.Receive(expected) :
+				parser.NextElement(expected);
 			if (element != null) {
 				ReceiveXml.Raise(this, new StanzaXmlEventArgs(element.ToXmlString()));
 			}
@@ -1133,7 +1194,10 @@ namespace Artalk.Xmpp.Core {
 			if (!Connected)
 				return;
 			// Close the XML stream.
-			Send("</stream:stream>");
+			if (bosh != null)
+				bosh.Close();
+			else
+				Send("</stream:stream>");
 			Connected = false;
 			Authenticated = false;
 			Disconnected.Raise(this, new EventArgs());

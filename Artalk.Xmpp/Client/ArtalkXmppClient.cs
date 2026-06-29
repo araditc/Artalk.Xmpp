@@ -199,6 +199,19 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// The BOSH connection manager URL. If this is set, the client connects
+		/// through XMPP over BOSH instead of a TCP XML stream.
+		/// </summary>
+		public Uri BoshUrl {
+			get {
+				return im.BoshUrl;
+			}
+			set {
+				im.BoshUrl = value;
+			}
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -556,6 +569,20 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the XmppClient class for XMPP over BOSH.
+		/// </summary>
+		/// <param name="boshUrl">The BOSH connection manager URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="username">The username with which to authenticate.</param>
+		/// <param name="password">The password with which to authenticate.</param>
+		public ArtalkXmppClient(Uri boshUrl, string hostname, string username,
+			string password) {
+			im = new XmppIm(boshUrl, hostname, username, password);
+			im.Disconnected += (sender, e) => StopKeepAlive();
+			LoadExtensions();
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the XmppClient class.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -578,6 +605,18 @@ namespace Artalk.Xmpp.Client {
 				im = new XmppIm(hostname, port, tls, validate, directTls);
 				im.Disconnected += (sender, e) => StopKeepAlive();
 				LoadExtensions();
+		}
+
+		/// <summary>
+		/// Initializes a new unauthenticated instance of the XmppClient class for
+		/// XMPP over BOSH.
+		/// </summary>
+		/// <param name="boshUrl">The BOSH connection manager URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		public ArtalkXmppClient(Uri boshUrl, string hostname) {
+			im = new XmppIm(boshUrl, hostname);
+			im.Disconnected += (sender, e) => StopKeepAlive();
+			LoadExtensions();
 		}
 
 		/// <summary>

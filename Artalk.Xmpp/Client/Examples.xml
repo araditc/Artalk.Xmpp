@@ -104,6 +104,24 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="Bosh">
+        <example>
+          This example demonstrates how to connect through an XMPP BOSH
+          connection manager.
+          <code language="c#">
+            Uri boshUrl = new Uri("https://chat.artalk.ir/http-bind");
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              password = "myPassword";
+
+            using (var cl = new ArtalkXmppClient(boshUrl, hostname, username,
+              password)) {
+              cl.Connect("bosh-client");
+              cl.SendMessage("ammar@artalk.ir", "Hello over BOSH");
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="PresenceTracking">
         <example>
           This example demonstrates how to track contact presence updates.

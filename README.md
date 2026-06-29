@@ -14,6 +14,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 
 - TCP XML streams
 - STARTTLS and direct TLS
+- XMPP over BOSH
 - SASL authentication: SCRAM-SHA3-512, SCRAM-SHA-512, SCRAM-SHA-384, SCRAM-SHA-256, SCRAM-SHA-224, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
@@ -34,7 +35,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.4.0
+dotnet add package Artalk.Xmpp --version 2.5.0
 ```
 
 Or reference the project directly:
@@ -82,6 +83,25 @@ using var client = new ArtalkXmppClient(
     directTls: true);
 
 client.Connect("service");
+```
+
+## BOSH
+
+For servers that expose XMPP over BOSH, pass the BOSH connection manager URL and the XMPP service domain:
+
+```csharp
+using Artalk.Xmpp.Client;
+
+var boshUrl = new Uri("https://chat.example.com/http-bind");
+
+using var client = new ArtalkXmppClient(
+    boshUrl,
+    "example.com",
+    "myusername",
+    "mypassword");
+
+client.Connect("bosh-client");
+client.SendMessage("room-user@example.com", "Hello over BOSH");
 ```
 
 ## Presence Tracking
@@ -166,6 +186,8 @@ client.Register(form => new SubmitForm(
 ## Security Notes
 
 STARTTLS now uses the platform certificate validator by default. If a server requires custom certificate validation, pass a `RemoteCertificateValidationCallback` to the client constructor.
+
+For BOSH, prefer an `https://` connection manager URL so the HTTP binding is protected by TLS.
 
 SCRAM `-PLUS` channel-binding variants are not advertised yet because the library does not expose TLS channel binding data to the SASL layer.
 
