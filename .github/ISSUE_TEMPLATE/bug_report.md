@@ -1,38 +1,45 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+about: Report a reproducible Artalk.Xmpp problem
+title: "[Bug]: "
+labels: bug
+assignees: ""
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Summary
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+Describe the problem and the behavior you expected.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Environment
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+- Artalk.Xmpp version:
+- .NET version:
+- Operating system:
+- Application type: console, service, ASP.NET, WinForms, other
+- XMPP server and version, if known:
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## Connection Details
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+- Host and port:
+- TLS mode: STARTTLS, direct TLS, or disabled
+- SASL mechanism selected, if known:
+- Resource name:
 
-**Additional context**
-Add any other context about the problem here.
+## Reproduction
+
+1. 
+2. 
+3. 
+
+## Logs
+
+Include the smallest useful `SendXml` / `ReceiveXml` trace or exception stack.
+Remove passwords, tokens, private messages, and personally identifiable data.
+
+```text
+
+```
+
+## Additional Context
+
+Add related issues, server configuration notes, or protocol references.

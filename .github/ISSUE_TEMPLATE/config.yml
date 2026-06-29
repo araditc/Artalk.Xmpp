@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: NuGet package
+    url: https://www.nuget.org/packages/Artalk.Xmpp/
+    about: Install the latest stable Artalk.Xmpp package.

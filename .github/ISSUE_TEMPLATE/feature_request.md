@@ -1,20 +1,30 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
-
+about: Request a protocol feature, compatibility change, or public API addition
+title: "[Feature]: "
+labels: enhancement
+assignees: ""
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Goal
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Describe what you want to build or connect to.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Protocol or Server Context
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+- XMPP RFC or XEP, if known:
+- Server or client that requires this behavior:
+- Existing Artalk.Xmpp API you are using:
+
+## Proposed Behavior
+
+Describe the API, protocol behavior, or sample you would like to see.
+
+## Alternatives
+
+Describe workarounds or alternative libraries you tried.
+
+## Compatibility
+
+Note whether this should be a non-breaking change, a major-version change, or a
+server-specific compatibility mode.
