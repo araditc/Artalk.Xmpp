@@ -103,6 +103,10 @@ namespace Artalk.Xmpp.Client {
 		/// </summary>
 		ServerIpCheck serverIpCheck;
 		/// <summary>
+		/// Provides access to the 'Multi-User Chat' XMPP extension.
+		/// </summary>
+		MultiUserChat multiUserChat;
+		/// <summary>
 		/// Provides access to the 'In-Band Registration' XMPP extension.
 		/// </summary>
 		InBandRegistration inBandRegistration;
@@ -346,6 +350,32 @@ namespace Artalk.Xmpp.Client {
 			}
 			remove {
 				im.Message -= value;
+			}
+		}
+
+		/// <summary>
+		/// The event that is raised when a groupchat message is received from a
+		/// joined multi-user chat room.
+		/// </summary>
+		public event EventHandler<RoomMessageEventArgs> RoomMessage {
+			add {
+				multiUserChat.RoomMessage += value;
+			}
+			remove {
+				multiUserChat.RoomMessage -= value;
+			}
+		}
+
+		/// <summary>
+		/// The event that is raised when occupant presence is received from a joined
+		/// multi-user chat room.
+		/// </summary>
+		public event EventHandler<RoomPresenceEventArgs> RoomPresence {
+			add {
+				multiUserChat.RoomPresence += value;
+			}
+			remove {
+				multiUserChat.RoomPresence -= value;
 			}
 		}
 
@@ -639,6 +669,48 @@ namespace Artalk.Xmpp.Client {
 			AssertValid();
 			message.ThrowIfNull("message");
 			im.SendMessage(message);
+		}
+
+		/// <summary>
+		/// Joins the specified multi-user chat room using the specified nickname.
+		/// </summary>
+		/// <param name="roomJid">The bare JID of the room to join.</param>
+		/// <param name="nickname">The nickname to use in the room.</param>
+		/// <param name="password">The room password, if required.</param>
+		/// <param name="maxHistoryStanzas">The maximum number of history stanzas to
+		/// request from the room, or null to let the server decide.</param>
+		/// <exception cref="ArgumentNullException">The roomJid parameter or the
+		/// nickname parameter is null.</exception>
+		/// <exception cref="ArgumentException">The nickname parameter is empty.</exception>
+		/// <exception cref="InvalidOperationException">The XmppClient instance is not
+		/// connected to a remote host, or the XmppClient instance has not authenticated
+		/// with the XMPP server.</exception>
+		public void JoinRoom(Jid roomJid, string nickname, string password = null,
+			int? maxHistoryStanzas = null) {
+			AssertValid();
+			multiUserChat.JoinRoom(roomJid, nickname, password, maxHistoryStanzas);
+		}
+
+		/// <summary>
+		/// Leaves the specified multi-user chat room.
+		/// </summary>
+		/// <param name="roomJid">The bare JID of the room to leave.</param>
+		/// <param name="nickname">The nickname used in the room.</param>
+		/// <param name="status">An optional status message.</param>
+		public void LeaveRoom(Jid roomJid, string nickname, string status = null) {
+			AssertValid();
+			multiUserChat.LeaveRoom(roomJid, nickname, status);
+		}
+
+		/// <summary>
+		/// Sends a message to the specified multi-user chat room.
+		/// </summary>
+		/// <param name="roomJid">The bare JID of the room.</param>
+		/// <param name="body">The message body.</param>
+		/// <param name="subject">An optional room subject.</param>
+		public void SendRoomMessage(Jid roomJid, string body, string subject = null) {
+			AssertValid();
+			multiUserChat.SendRoomMessage(roomJid, body, subject);
 		}
 
 		/// <summary>
@@ -1491,6 +1563,7 @@ namespace Artalk.Xmpp.Client {
 			FileTransferSettings = new FileTransferSettings(socks5Bytestreams,
 				siFileTransfer);
 			serverIpCheck = im.LoadExtension<ServerIpCheck>();
+			multiUserChat = im.LoadExtension<MultiUserChat>();
 			inBandRegistration = im.LoadExtension<InBandRegistration>();
 			chatStateNotifications = im.LoadExtension<ChatStateNotifications>();
 			bitsOfBinary = im.LoadExtension<BitsOfBinary>();

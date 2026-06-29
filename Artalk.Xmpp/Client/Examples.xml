@@ -124,6 +124,36 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="MultiUserChat">
+        <example>
+          This example demonstrates how to join a multi-user chat room and
+          receive groupchat messages.
+          <code language="c#">
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              password = "myPassword";
+            Jid room = "room@conference.artalk.ir";
+
+            using (var cl = new ArtalkXmppClient(hostname, username, password)) {
+              cl.RoomMessage += (sender, e) => {
+                Console.WriteLine("[" + e.RoomJid + "] " +
+                  e.Nickname + ": " + e.Message.Body);
+              };
+
+              cl.RoomPresence += (sender, e) => {
+                Console.WriteLine(e.Occupant.Nickname + " available: " +
+                  e.IsAvailable);
+              };
+
+              cl.Connect("muc-sample");
+              cl.JoinRoom(room, "myNickname");
+              cl.SendRoomMessage(room, "Hello room");
+              Console.ReadLine();
+              cl.LeaveRoom(room, "myNickname");
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="Register">
         <example>
           This example demonstrates how to register a new account with a server

@@ -100,6 +100,10 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		public static string ServerIpCheck = "ServerIpCheck";
 		/// <summary>
+		/// An extension for participating in multi-user chat rooms.
+		/// </summary>
+		public static string MultiUserChat = "MultiUserChat";
+		/// <summary>
 		/// An extension for in-band registration with XMPP-based instant messaging
 		/// servers and other services hosted on an XMPP network.
 		/// </summary>

@@ -17,6 +17,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - SASL authentication: SCRAM-SHA-256, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
+- Multi-user chat basics: join, leave, groupchat messages, and occupant presence
 - Roster management
 - Service discovery
 - Entity capabilities
@@ -33,7 +34,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.1.0
+dotnet add package Artalk.Xmpp --version 2.2.0
 ```
 
 Or reference the project directly:
@@ -96,6 +97,28 @@ client.StatusChanged += (sender, e) => {
 
 client.Connect("presence-sample");
 client.SetStatus(Availability.Online, "Ready");
+```
+
+## Multi-User Chat
+
+Basic XEP-0045 room participation is available through the high-level client. Join a room with a nickname, receive groupchat messages, track occupant presence, and send room messages:
+
+```csharp
+using Artalk.Xmpp.Client;
+
+using var client = new ArtalkXmppClient("example.com", "myusername", "mypassword");
+
+client.RoomMessage += (sender, e) => {
+    Console.WriteLine($"[{e.RoomJid}] {e.Nickname}: {e.Message.Body}");
+};
+
+client.RoomPresence += (sender, e) => {
+    Console.WriteLine($"{e.Occupant.Nickname} available: {e.IsAvailable}");
+};
+
+client.Connect("muc-sample");
+client.JoinRoom("room@conference.example.com", "my-nickname");
+client.SendRoomMessage("room@conference.example.com", "Hello room");
 ```
 
 ## In-Band Registration
