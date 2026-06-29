@@ -88,6 +88,58 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="DirectTls">
+        <example>
+          This example demonstrates how to connect to a server that expects TLS
+          immediately after the TCP connection is established.
+          <code language="c#">
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              password = "myPassword";
+
+            using (var cl = new ArtalkXmppClient(hostname, username, password,
+              port: 5223, directTls: true)) {
+              cl.Connect("direct-tls-client");
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
+      <ArtalkXmppClient name="PresenceTracking">
+        <example>
+          This example demonstrates how to track contact presence updates.
+          <code language="c#">
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              password = "myPassword";
+
+            using (var cl = new ArtalkXmppClient(hostname, username, password)) {
+              cl.StatusChanged += (sender, e) => {
+                Console.WriteLine(e.Jid + ": " + e.Status.Availability);
+              };
+
+              cl.Connect("presence-sample");
+              cl.SetStatus(Availability.Online, "Ready");
+              Console.ReadLine();
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
+      <ArtalkXmppClient name="Register">
+        <example>
+          This example demonstrates how to register a new account with a server
+          that supports in-band registration.
+          <code language="c#">
+            string hostname = "artalk.ir";
+
+            using (var cl = new ArtalkXmppClient(hostname)) {
+              cl.Connect();
+              cl.Register(form => new SubmitForm(
+                new TextField("username", "myNewUsername"),
+                new PasswordField("password", "myNewPassword")));
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="SetTune">
         <example>
           This example demonstrates how to use the SetTune method in order

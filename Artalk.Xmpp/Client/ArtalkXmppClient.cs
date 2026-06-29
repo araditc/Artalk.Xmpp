@@ -177,6 +177,18 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// If true TLS/SSL is negotiated immediately after opening the TCP connection.
+		/// </summary>
+		public bool DirectTls {
+			get {
+				return im.DirectTls;
+			}
+			set {
+				im.DirectTls = value;
+			}
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -195,6 +207,15 @@ namespace Artalk.Xmpp.Client {
 		public bool IsEncrypted {
 			get {
 				return im.IsEncrypted;
+			}
+		}
+
+		/// <summary>
+		/// Determines whether the server advertised legacy XMPP session establishment.
+		/// </summary>
+		public bool SessionSupported {
+			get {
+				return im.SessionSupported;
 			}
 		}
 
@@ -453,8 +474,10 @@ namespace Artalk.Xmpp.Client {
 		/// <remarks>Use this constructor if you wish to connect to an XMPP server using
 		/// an existing set of user credentials.</remarks>
 		public ArtalkXmppClient(string hostname, string username, string password,
-			int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null) {
-				im = new XmppIm(hostname, username, password, port, tls, validate);
+			int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null,
+			bool directTls = false) {
+				im = new XmppIm(hostname, username, password, port, tls, validate,
+					directTls);
 			// Initialize the various extension modules.
 			LoadExtensions();
 		}
@@ -478,8 +501,8 @@ namespace Artalk.Xmpp.Client {
 		/// <remarks>Use this constructor if you wish to register an XMPP account using
 		/// the in-band account registration process supported by some servers.</remarks>
 		public ArtalkXmppClient(string hostname, int port = 5222, bool tls = true,
-			RemoteCertificateValidationCallback validate = null) {
-				im = new XmppIm(hostname, port, tls, validate);
+			RemoteCertificateValidationCallback validate = null, bool directTls = false) {
+				im = new XmppIm(hostname, port, tls, validate, directTls);
 				LoadExtensions();
 		}
 

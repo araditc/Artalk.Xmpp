@@ -104,6 +104,18 @@ namespace Artalk.Xmpp.Im {
 		}
 
 		/// <summary>
+		/// If true TLS/SSL is negotiated immediately after opening the TCP connection.
+		/// </summary>
+		public bool DirectTls {
+			get {
+				return core.DirectTls;
+			}
+			set {
+				core.DirectTls = value;
+			}
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -122,6 +134,15 @@ namespace Artalk.Xmpp.Im {
 		public bool IsEncrypted {
 			get {
 				return core.IsEncrypted;
+			}
+		}
+
+		/// <summary>
+		/// Determines whether the server advertised legacy XMPP session establishment.
+		/// </summary>
+		public bool SessionSupported {
+			get {
+				return core.SessionSupported;
 			}
 		}
 
@@ -236,8 +257,10 @@ namespace Artalk.Xmpp.Im {
 		/// <exception cref="ArgumentOutOfRangeException">The value of the port parameter
 		/// is not a valid port number.</exception>
 		public XmppIm(string hostname, string username, string password,
-			int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null) {
-				core = new XmppCore(hostname, username, password, port, tls, validate);
+			int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null,
+			bool directTls = false) {
+				core = new XmppCore(hostname, username, password, port, tls, validate,
+					directTls);
 				SetupEventHandlers();
 		}
 
@@ -258,8 +281,8 @@ namespace Artalk.Xmpp.Im {
 		/// <exception cref="ArgumentOutOfRangeException">The value of the port parameter
 		/// is not a valid port number.</exception>
 		public XmppIm(string hostname, int port = 5222, bool tls = true,
-			RemoteCertificateValidationCallback validate = null) {
-			core = new XmppCore(hostname, port, tls, validate);
+			RemoteCertificateValidationCallback validate = null, bool directTls = false) {
+			core = new XmppCore(hostname, port, tls, validate, directTls);
 			SetupEventHandlers();
 		}
 
@@ -297,8 +320,8 @@ namespace Artalk.Xmpp.Im {
 				// If no username has been providd, don't establish a session.
 				if (Username == null)
 					return null;
-				// Establish a session (Refer to RFC 3921, Section 3. Session Establishment).
-				EstablishSession();
+				// Establish a session only when the server advertises the legacy feature.
+				EstablishSessionIfSupported();
 				// Retrieve user's roster as recommended (Refer to RFC 3921, Section 7.3).
 				Roster roster = GetRoster();
 				// Send initial presence.
@@ -333,8 +356,8 @@ namespace Artalk.Xmpp.Im {
 			username.ThrowIfNull("username");
 			password.ThrowIfNull("password");
 			core.Authenticate(username, password);
-			// Establish a session (Refer to RFC 3921, Section 3. Session Establishment).
-			EstablishSession();
+			// Establish a session only when the server advertises the legacy feature.
+			EstablishSessionIfSupported();
 			// Retrieve user's roster as recommended (Refer to RFC 3921, Section 7.3).
 			Roster roster = GetRoster();
 			// Send initial presence.
@@ -1457,6 +1480,11 @@ namespace Artalk.Xmpp.Im {
 				Xml.Element("session", "urn:ietf:params:xml:ns:xmpp-session"));
 			if (ret.Type == IqType.Error)
 				throw Util.ExceptionFromError(ret, "Session establishment failed.");
+		}
+
+		void EstablishSessionIfSupported() {
+			if (core.SessionSupported)
+				EstablishSession();
 		}
 
 		/// <summary>

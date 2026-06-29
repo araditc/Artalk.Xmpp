@@ -8,14 +8,14 @@ namespace Artalk.ExtendedClient
     {
         private readonly PrivateXmlStorage _privateStorage;
 
-        public ExtendedXmppClient(string hostname, string username, string password, int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null)
-            : base(hostname, username, password, port, tls, validate)
+        public ExtendedXmppClient(string hostname, string username, string password, int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null, bool directTls = false)
+            : base(hostname, username, password, port, tls, validate, directTls)
         {
             _privateStorage = LoadExtension<PrivateXmlStorage>();
         }
 
-        public ExtendedXmppClient(string hostname, int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null)
-            : base(hostname, port, tls, validate)
+        public ExtendedXmppClient(string hostname, int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null, bool directTls = false)
+            : base(hostname, port, tls, validate, directTls)
         {
             _privateStorage = LoadExtension<PrivateXmlStorage>();
         }

@@ -166,6 +166,14 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		/// <summary>
+		/// If true TLS/SSL is negotiated immediately after opening the TCP connection.
+		/// </summary>
+		public bool DirectTls {
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -178,6 +186,14 @@ namespace Artalk.Xmpp.Core {
 		/// Determines whether the session with the server is TLS/SSL encrypted.
 		/// </summary>
 		public bool IsEncrypted {
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Determines whether the server advertised legacy XMPP session establishment.
+		/// </summary>
+		public bool SessionSupported {
 			get;
 			private set;
 		}
@@ -271,13 +287,15 @@ namespace Artalk.Xmpp.Core {
 		/// <exception cref="ArgumentOutOfRangeException">The value of the port parameter
 		/// is not a valid port number.</exception>
 		public XmppCore(string hostname, string username, string password,
-			int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null) {
+			int port = 5222, bool tls = true, RemoteCertificateValidationCallback validate = null,
+			bool directTls = false) {
 				Hostname = hostname;
 				Username = username;
 				Password = password;
 				Port = port;
 				Tls = tls;
 				Validate = validate;
+				DirectTls = directTls;
 		}
 
 		/// <summary>
@@ -297,11 +315,12 @@ namespace Artalk.Xmpp.Core {
 		/// <exception cref="ArgumentOutOfRangeException">The value of the port parameter
 		/// is not a valid port number.</exception>
 		public XmppCore(string hostname, int port = 5222, bool tls = true,
-			RemoteCertificateValidationCallback validate = null) {
+			RemoteCertificateValidationCallback validate = null, bool directTls = false) {
 			Hostname = hostname;
 			Port = port;
 			Tls = tls;
 			Validate = validate;
+			DirectTls = directTls;
 		}
 
 		/// <summary>
@@ -329,6 +348,10 @@ namespace Artalk.Xmpp.Core {
 			try {
 				client = new TcpClient(Hostname, Port);
 				stream = client.GetStream();
+				IsEncrypted = false;
+				SessionSupported = false;
+				if (DirectTls)
+					SecureStream(Hostname, Validate);
 				// Sets up the connection which includes TLS and possibly SASL negotiation.
 				SetupConnection(this.resource);
 				// We are connected.
@@ -729,7 +752,7 @@ namespace Artalk.Xmpp.Core {
 			// Request the initial stream.
 			XmlElement feats = InitiateStream(Hostname);
 			// Server supports TLS/SSL via STARTTLS.
-			if (feats["starttls"] != null) {
+			if (feats["starttls"] != null && !IsEncrypted) {
 				// TLS is mandatory and user opted out of it.
 				if (feats["starttls"]["required"] != null && Tls == false)
 					throw new AuthenticationException("The server requires TLS/SSL.");
@@ -752,6 +775,7 @@ namespace Artalk.Xmpp.Core {
 			// Continue with SASL authentication.
 			try {
 				feats = Authenticate(list, Username, Password, Hostname);
+				SessionSupported = feats["session"] != null;
 				// FIXME: How is the client's JID constructed if the server does not support
 				// resource binding?
 				if (feats["bind"] != null)
@@ -815,13 +839,16 @@ namespace Artalk.Xmpp.Core {
 			// Send STARTTLS command and ensure the server acknowledges the request.
 			SendAndReceive(Xml.Element("starttls",
 				"urn:ietf:params:xml:ns:xmpp-tls"), "proceed");
-			// Complete TLS negotiation and switch to secure stream.
+			SecureStream(hostname, validate);
+			// Initiate a new stream to server.
+			return InitiateStream(hostname);
+		}
+
+		void SecureStream(string hostname, RemoteCertificateValidationCallback validate) {
 			SslStream sslStream = new SslStream(stream, false, validate);
 			sslStream.AuthenticateAsClient(hostname);
 			stream = sslStream;
 			IsEncrypted = true;
-			// Initiate a new stream to server.
-			return InitiateStream(hostname);
 		}
 
 		/// <summary>
@@ -888,8 +915,8 @@ namespace Artalk.Xmpp.Core {
 		/// <exception cref="SaslException">No supported mechanism could be found in
 		/// the list of mechanisms advertised by the server.</exception>
 		string SelectMechanism(IEnumerable<string> mechanisms) {
-			// Precedence: SCRAM-SHA-1, DIGEST-MD5, PLAIN.
-			string[] m = new string[] { "SCRAM-SHA-1", "DIGEST-MD5", "PLAIN" };
+			// Precedence: SCRAM-SHA-256, SCRAM-SHA-1, DIGEST-MD5, PLAIN.
+			string[] m = new string[] { "SCRAM-SHA-256", "SCRAM-SHA-1", "DIGEST-MD5", "PLAIN" };
 			for (int i = 0; i < m.Length; i++) {
 				if (mechanisms.Contains(m[i], StringComparer.InvariantCultureIgnoreCase))
 					return m[i];

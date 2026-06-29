@@ -13,8 +13,9 @@ The core library targets `net10.0` and does not require Windows-only packages.
 ## Supported XMPP Features
 
 - TCP XML streams
-- STARTTLS
-- SASL authentication: PLAIN, DIGEST-MD5, SCRAM-SHA-1
+- STARTTLS and direct TLS
+- SASL authentication: SCRAM-SHA-256, SCRAM-SHA-1, DIGEST-MD5, PLAIN
+- Optional legacy XMPP session establishment
 - Instant messaging and presence
 - Roster management
 - Service discovery
@@ -29,7 +30,13 @@ The core library targets `net10.0` and does not require Windows-only packages.
 
 ## Install
 
-Reference the project directly:
+Install the NuGet package:
+
+```powershell
+dotnet add package Artalk.Xmpp --version 2.1.0
+```
+
+Or reference the project directly:
 
 ```xml
 <ProjectReference Include="..\Artalk.Xmpp\Artalk.Xmpp.csproj" />
@@ -61,9 +68,57 @@ client.Connect("my-resource");
 client.SendMessage("friend@example.com", "Hello from Artalk.Xmpp", type: MessageType.Chat);
 ```
 
+## Direct TLS
+
+Most XMPP servers use STARTTLS on port 5222, which remains the default. For servers that expect TLS immediately after TCP connect, use the `directTls` constructor argument and the server's TLS port, commonly 5223:
+
+```csharp
+using var client = new ArtalkXmppClient(
+    "xmpp.example.com",
+    "myusername",
+    "mypassword",
+    port: 5223,
+    directTls: true);
+
+client.Connect("service");
+```
+
+## Presence Tracking
+
+`Connect` retrieves the roster and sends initial presence. Subscribe to `StatusChanged` before connecting to track online, away, and offline updates from contacts:
+
+```csharp
+using var client = new ArtalkXmppClient("example.com", "myusername", "mypassword");
+
+client.StatusChanged += (sender, e) => {
+    Console.WriteLine($"{e.Jid}: {e.Status.Availability} {e.Status.Message}");
+};
+
+client.Connect("presence-sample");
+client.SetStatus(Availability.Online, "Ready");
+```
+
+## In-Band Registration
+
+Some servers allow XEP-0077 account registration before authenticating. Create the client without credentials, connect, and fill the server-provided form:
+
+```csharp
+using Artalk.Xmpp.Client;
+using Artalk.Xmpp.Extensions.Dataforms;
+
+using var client = new ArtalkXmppClient("example.com");
+
+client.Connect();
+client.Register(form => new SubmitForm(
+    new TextField("username", "newuser"),
+    new PasswordField("password", "new-password")));
+```
+
 ## Security Notes
 
 STARTTLS now uses the platform certificate validator by default. If a server requires custom certificate validation, pass a `RemoteCertificateValidationCallback` to the client constructor.
+
+When a server advertises legacy XMPP session establishment, Artalk.Xmpp completes it. Modern servers that omit the legacy session feature are no longer rejected during sign-in.
 
 Automatic UPnP port mapping is disabled in the .NET 10 cross-platform build because the previous implementation depended on a Windows COM component. File transfer still supports SOCKS5, configured proxies, in-band bytestreams, and STUN-based address discovery.
 
