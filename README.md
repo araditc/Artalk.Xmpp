@@ -15,7 +15,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - TCP XML streams
 - STARTTLS and direct TLS
 - XMPP over BOSH
-- SASL authentication: SCRAM-SHA3-512, SCRAM-SHA-512, SCRAM-SHA-384, SCRAM-SHA-256, SCRAM-SHA-224, SCRAM-SHA-1, DIGEST-MD5, PLAIN
+- SASL authentication: SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
 - Multi-user chat basics: join, leave, groupchat messages, and occupant presence
@@ -35,7 +35,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.5.0
+dotnet add package Artalk.Xmpp --version 2.6.0
 ```
 
 Or reference the project directly:
@@ -189,7 +189,7 @@ STARTTLS now uses the platform certificate validator by default. If a server req
 
 For BOSH, prefer an `https://` connection manager URL so the HTTP binding is protected by TLS.
 
-SCRAM `-PLUS` channel-binding variants are not advertised yet because the library does not expose TLS channel binding data to the SASL layer.
+SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. The current channel binding type is `tls-server-end-point`. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
 
 When a server advertises legacy XMPP session establishment, Artalk.Xmpp completes it. Modern servers that omit the legacy session feature are no longer rejected during sign-in.
 

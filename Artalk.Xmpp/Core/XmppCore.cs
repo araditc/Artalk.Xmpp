@@ -31,6 +31,7 @@ namespace Artalk.Xmpp.Core {
 		BoshTransport bosh;
 		readonly HttpMessageHandler boshMessageHandler;
 		bool boshStreamOpened;
+		byte[] tlsServerEndPointChannelBinding;
 		/// <summary>
 		/// The parser instance used for parsing incoming XMPP XML-stream data.
 		/// </summary>
@@ -391,10 +392,12 @@ namespace Artalk.Xmpp.Core {
 					bosh = new BoshTransport(BoshUrl, Hostname, boshMessageHandler);
 					boshStreamOpened = false;
 					IsEncrypted = bosh.IsEncrypted;
+					tlsServerEndPointChannelBinding = null;
 				} else {
 					client = new TcpClient(Hostname, Port);
 					stream = client.GetStream();
 					IsEncrypted = false;
+					tlsServerEndPointChannelBinding = null;
 				}
 				SessionSupported = false;
 				if (DirectTls && bosh == null)
@@ -905,6 +908,8 @@ namespace Artalk.Xmpp.Core {
 			sslStream.AuthenticateAsClient(hostname);
 			stream = sslStream;
 			IsEncrypted = true;
+			tlsServerEndPointChannelBinding = sslStream.RemoteCertificate == null ?
+				null : ChannelBinding.CreateTlsServerEndPoint(sslStream.RemoteCertificate);
 		}
 
 		/// <summary>
@@ -931,6 +936,10 @@ namespace Artalk.Xmpp.Core {
 				SaslMechanism m = SaslFactory.Create(name);
 				m.Properties.Add("Username", username);
 				m.Properties.Add("Password", password);
+				if (name.EndsWith("-PLUS", StringComparison.InvariantCultureIgnoreCase)) {
+					m.Properties.Add("ChannelBindingName", ChannelBinding.TlsServerEndPoint);
+					m.Properties.Add("ChannelBindingData", tlsServerEndPointChannelBinding);
+				}
 				var xml = Xml.Element("auth", "urn:ietf:params:xml:ns:xmpp-sasl")
 					.Attr("mechanism", name)
 					.Text(m.HasInitial ? m.GetResponse(String.Empty) : String.Empty);
@@ -971,7 +980,16 @@ namespace Artalk.Xmpp.Core {
 		/// <exception cref="SaslException">No supported mechanism could be found in
 		/// the list of mechanisms advertised by the server.</exception>
 		string SelectMechanism(IEnumerable<string> mechanisms) {
-			string[] m = new string[] {
+			var m = new List<string>();
+			if (tlsServerEndPointChannelBinding != null) {
+				m.Add("SCRAM-SHA3-512-PLUS");
+				m.Add("SCRAM-SHA-512-PLUS");
+				m.Add("SCRAM-SHA-384-PLUS");
+				m.Add("SCRAM-SHA-256-PLUS");
+				m.Add("SCRAM-SHA-224-PLUS");
+				m.Add("SCRAM-SHA-1-PLUS");
+			}
+			m.AddRange(new string[] {
 				"SCRAM-SHA3-512",
 				"SCRAM-SHA-512",
 				"SCRAM-SHA-384",
@@ -980,8 +998,8 @@ namespace Artalk.Xmpp.Core {
 				"SCRAM-SHA-1",
 				"DIGEST-MD5",
 				"PLAIN"
-			};
-			for (int i = 0; i < m.Length; i++) {
+			});
+			for (int i = 0; i < m.Count; i++) {
 				if (mechanisms.Contains(m[i], StringComparer.InvariantCultureIgnoreCase))
 					return m[i];
 			}

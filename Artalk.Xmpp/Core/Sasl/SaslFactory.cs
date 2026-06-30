@@ -74,11 +74,17 @@ namespace Artalk.Xmpp.Core.Sasl {
 			var list = new Dictionary<string, Type>() {
 				{ "PLAIN", typeof(Sasl.Mechanisms.SaslPlain) },
 				{ "DIGEST-MD5", typeof(Sasl.Mechanisms.SaslDigestMd5) },
+				{ "SCRAM-SHA3-512-PLUS", typeof(Sasl.Mechanisms.SaslScramSha3_512Plus) },
 				{ "SCRAM-SHA3-512", typeof(Sasl.Mechanisms.SaslScramSha3_512) },
+				{ "SCRAM-SHA-512-PLUS", typeof(Sasl.Mechanisms.SaslScramSha512Plus) },
 				{ "SCRAM-SHA-512", typeof(Sasl.Mechanisms.SaslScramSha512) },
+				{ "SCRAM-SHA-384-PLUS", typeof(Sasl.Mechanisms.SaslScramSha384Plus) },
 				{ "SCRAM-SHA-384", typeof(Sasl.Mechanisms.SaslScramSha384) },
+				{ "SCRAM-SHA-256-PLUS", typeof(Sasl.Mechanisms.SaslScramSha256Plus) },
 				{ "SCRAM-SHA-256", typeof(Sasl.Mechanisms.SaslScramSha256) },
+				{ "SCRAM-SHA-224-PLUS", typeof(Sasl.Mechanisms.SaslScramSha224Plus) },
 				{ "SCRAM-SHA-224", typeof(Sasl.Mechanisms.SaslScramSha224) },
+				{ "SCRAM-SHA-1-PLUS", typeof(Sasl.Mechanisms.SaslScramSha1Plus) },
 				{ "SCRAM-SHA-1", typeof(Sasl.Mechanisms.SaslScramSha1) },
 			};
 			foreach (string key in list.Keys)

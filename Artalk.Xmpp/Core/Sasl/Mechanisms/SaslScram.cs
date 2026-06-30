@@ -12,6 +12,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 		readonly int hashLength;
 		readonly Func<byte[], byte[], byte[]> hmac;
 		readonly Func<byte[], byte[]> hash;
+		readonly string channelBindingName;
 
 		bool completed;
 		string cnonce = GenerateCnonce();
@@ -61,7 +62,8 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 		}
 
 		protected SaslScram(string mechanismName, int hashLength,
-			Func<byte[], byte[], byte[]> hmac, Func<byte[], byte[]> hash) {
+			Func<byte[], byte[], byte[]> hmac, Func<byte[], byte[]> hash,
+			string channelBindingName = null) {
 			mechanismName.ThrowIfNullOrEmpty("mechanismName");
 			hmac.ThrowIfNull("hmac");
 			hash.ThrowIfNull("hash");
@@ -69,6 +71,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			this.hashLength = hashLength;
 			this.hmac = hmac;
 			this.hash = hash;
+			this.channelBindingName = channelBindingName;
 		}
 
 		protected SaslScram(string mechanismName, int hashLength,
@@ -82,6 +85,16 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			Func<byte[], byte[], byte[]> hmac, Func<byte[], byte[]> hash,
 			string username, string password, string cnonce) : this(mechanismName,
 			hashLength, hmac, hash, username, password) {
+			cnonce.ThrowIfNullOrEmpty("cnonce");
+			this.cnonce = cnonce;
+		}
+
+		protected SaslScram(string mechanismName, int hashLength,
+			Func<byte[], byte[], byte[]> hmac, Func<byte[], byte[]> hash,
+			string username, string password, string cnonce,
+			string channelBindingName) : this(mechanismName, hashLength, hmac,
+			hash, channelBindingName) {
+			SetCredentials(username, password);
 			cnonce.ThrowIfNullOrEmpty("cnonce");
 			this.cnonce = cnonce;
 		}
@@ -112,7 +125,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 		}
 
 		byte[] ComputeInitialResponse() {
-			return Encoding.UTF8.GetBytes("n,,n=" + SaslPrep(Username) + ",r=" +
+			return Encoding.UTF8.GetBytes(GetGs2Header() + "n=" + SaslPrep(Username) + ",r=" +
 				cnonce);
 		}
 
@@ -125,8 +138,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 
 			string clientFirstBare = "n=" + SaslPrep(Username) + ",r=" + cnonce,
 				serverFirstMessage = Encoding.UTF8.GetString(challenge),
-				withoutProof = "c=" +
-				Convert.ToBase64String(Encoding.UTF8.GetBytes("n,,")) + ",r=" +
+				withoutProof = "c=" + Convert.ToBase64String(GetCbindInput()) + ",r=" +
 				nonce;
 			authMessage = clientFirstBare + "," + serverFirstMessage + "," +
 				withoutProof;
@@ -199,6 +211,32 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 
 		byte[] ComputeHash(byte[] data) {
 			return hash(data);
+		}
+
+		string GetGs2Header() {
+			return channelBindingName == null ? "n,," : "p=" + channelBindingName + ",,";
+		}
+
+		byte[] GetCbindInput() {
+			byte[] gs2Header = Encoding.UTF8.GetBytes(GetGs2Header());
+			if (channelBindingName == null)
+				return gs2Header;
+			byte[] channelBindingData = GetChannelBindingData();
+			byte[] cbind = new byte[gs2Header.Length + channelBindingData.Length];
+			Buffer.BlockCopy(gs2Header, 0, cbind, 0, gs2Header.Length);
+			Buffer.BlockCopy(channelBindingData, 0, cbind, gs2Header.Length,
+				channelBindingData.Length);
+			return cbind;
+		}
+
+		byte[] GetChannelBindingData() {
+			object data;
+			if (!Properties.TryGetValue("ChannelBindingData", out data))
+				throw new SaslException("SCRAM-PLUS requires channel binding data.");
+			byte[] bytes = data as byte[];
+			if (bytes == null || bytes.Length == 0)
+				throw new SaslException("SCRAM-PLUS requires channel binding data.");
+			return bytes;
 		}
 
 		byte[] Xor(byte[] a, byte[] b) {
