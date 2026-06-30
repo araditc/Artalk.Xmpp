@@ -122,6 +122,23 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="OAuthBearer">
+        <example>
+          This example demonstrates how to authenticate with a server that
+          advertises the SASL OAUTHBEARER mechanism.
+          <code language="c#">
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              accessToken = "OAuthAccessToken";
+
+            using (var cl = new ArtalkXmppClient(hostname)) {
+              cl.Username = username;
+              cl.OAuthBearerToken = accessToken;
+              cl.Connect("oauth-client");
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="PresenceTracking">
         <example>
           This example demonstrates how to track contact presence updates.

@@ -175,6 +175,18 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// An OAuth 2.0 bearer token for SASL OAUTHBEARER authentication.
+		/// </summary>
+		public string OAuthBearerToken {
+			get {
+				return im.OAuthBearerToken;
+			}
+			set {
+				im.OAuthBearerToken = value;
+			}
+		}
+
+		/// <summary>
 		/// If true the session will be TLS/SSL-encrypted if the server supports it.
 		/// </summary>
 		public bool Tls {

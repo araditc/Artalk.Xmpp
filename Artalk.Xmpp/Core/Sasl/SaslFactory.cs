@@ -73,6 +73,7 @@ namespace Artalk.Xmpp.Core.Sasl {
 			// Could be moved to App.config to support SASL "plug-in" mechanisms.
 			var list = new Dictionary<string, Type>() {
 				{ "PLAIN", typeof(Sasl.Mechanisms.SaslPlain) },
+				{ "OAUTHBEARER", typeof(Sasl.Mechanisms.SaslOAuthBearer) },
 				{ "DIGEST-MD5", typeof(Sasl.Mechanisms.SaslDigestMd5) },
 				{ "SCRAM-SHA3-512-PLUS", typeof(Sasl.Mechanisms.SaslScramSha3_512Plus) },
 				{ "SCRAM-SHA3-512", typeof(Sasl.Mechanisms.SaslScramSha3_512) },

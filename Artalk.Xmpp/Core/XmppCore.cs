@@ -60,6 +60,7 @@ namespace Artalk.Xmpp.Core {
 		/// The password with which to authenticate.
 		/// </summary>
 		string password;
+		string oauthBearerToken;
 		/// <summary>
 		/// The resource to use for binding.
 		/// </summary>
@@ -159,6 +160,18 @@ namespace Artalk.Xmpp.Core {
 			set {
 				value.ThrowIfNull("Password");
 				password = value;
+			}
+		}
+
+		/// <summary>
+		/// An OAuth 2.0 bearer token for SASL OAUTHBEARER authentication.
+		/// </summary>
+		public string OAuthBearerToken {
+			get {
+				return oauthBearerToken;
+			}
+			set {
+				oauthBearerToken = value;
 			}
 		}
 
@@ -936,6 +949,11 @@ namespace Artalk.Xmpp.Core {
 				SaslMechanism m = SaslFactory.Create(name);
 				m.Properties.Add("Username", username);
 				m.Properties.Add("Password", password);
+				if (!String.IsNullOrEmpty(OAuthBearerToken)) {
+					m.Properties.Add("OAuthBearerToken", OAuthBearerToken);
+					m.Properties.Add("Hostname", hostname);
+					m.Properties.Add("Port", Port);
+				}
 				if (name.EndsWith("-PLUS", StringComparison.InvariantCultureIgnoreCase)) {
 					m.Properties.Add("ChannelBindingName", ChannelBinding.TlsServerEndPoint);
 					m.Properties.Add("ChannelBindingData", tlsServerEndPointChannelBinding);
@@ -981,24 +999,28 @@ namespace Artalk.Xmpp.Core {
 		/// the list of mechanisms advertised by the server.</exception>
 		string SelectMechanism(IEnumerable<string> mechanisms) {
 			var m = new List<string>();
-			if (tlsServerEndPointChannelBinding != null) {
-				m.Add("SCRAM-SHA3-512-PLUS");
-				m.Add("SCRAM-SHA-512-PLUS");
-				m.Add("SCRAM-SHA-384-PLUS");
-				m.Add("SCRAM-SHA-256-PLUS");
-				m.Add("SCRAM-SHA-224-PLUS");
-				m.Add("SCRAM-SHA-1-PLUS");
+			if (!String.IsNullOrEmpty(OAuthBearerToken))
+				m.Add("OAUTHBEARER");
+			if (Password != null) {
+				if (tlsServerEndPointChannelBinding != null) {
+					m.Add("SCRAM-SHA3-512-PLUS");
+					m.Add("SCRAM-SHA-512-PLUS");
+					m.Add("SCRAM-SHA-384-PLUS");
+					m.Add("SCRAM-SHA-256-PLUS");
+					m.Add("SCRAM-SHA-224-PLUS");
+					m.Add("SCRAM-SHA-1-PLUS");
+				}
+				m.AddRange(new string[] {
+					"SCRAM-SHA3-512",
+					"SCRAM-SHA-512",
+					"SCRAM-SHA-384",
+					"SCRAM-SHA-256",
+					"SCRAM-SHA-224",
+					"SCRAM-SHA-1",
+					"DIGEST-MD5",
+					"PLAIN"
+				});
 			}
-			m.AddRange(new string[] {
-				"SCRAM-SHA3-512",
-				"SCRAM-SHA-512",
-				"SCRAM-SHA-384",
-				"SCRAM-SHA-256",
-				"SCRAM-SHA-224",
-				"SCRAM-SHA-1",
-				"DIGEST-MD5",
-				"PLAIN"
-			});
 			for (int i = 0; i < m.Count; i++) {
 				if (mechanisms.Contains(m[i], StringComparer.InvariantCultureIgnoreCase))
 					return m[i];
