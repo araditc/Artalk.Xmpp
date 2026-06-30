@@ -1,5 +1,8 @@
 using Artalk.Xmpp;
 using Artalk.Xmpp.Extensions;
+using Artalk.Xmpp.Im;
+using System.Security.Cryptography;
+using System.Text;
 using System.Xml;
 
 namespace Artalk.Xmpp.Tests;
@@ -12,7 +15,7 @@ public sealed class OmemoTests {
 
 		XmlElement element = deviceList.ToXmlElement();
 
-		Assert.AreEqual("list", element.LocalName);
+		Assert.AreEqual("devices", element.LocalName);
 		Assert.AreEqual(OmemoDeviceList.Namespace, element.NamespaceURI);
 		Assert.HasCount(2, element.GetElementsByTagName("device"));
 		Assert.AreEqual("42", ((XmlElement) element.ChildNodes[0]!).GetAttribute("id"));
@@ -22,20 +25,35 @@ public sealed class OmemoTests {
 	[TestMethod]
 	public void DeviceListParsesPayload() {
 		XmlElement element = LoadElement(
+			"<devices xmlns='urn:xmpp:omemo:2'>" +
+			"<device id='10' label='Phone' labelsig='AQID'/>" +
+			"<device id='20'/></devices>");
+
+		OmemoDeviceList deviceList = OmemoDeviceList.Parse(element);
+
+		CollectionAssert.AreEqual(new uint[] { 10, 20 }, deviceList.DeviceIds.ToArray());
+		Assert.AreEqual("Phone", deviceList.Devices[0].Label);
+		CollectionAssert.AreEqual(new byte[] { 1, 2, 3 },
+			deviceList.Devices[0].LabelSignature);
+	}
+
+	[TestMethod]
+	public void DeviceListRejectsInvalidDeviceId() {
+		XmlElement element = LoadElement(
+			"<devices xmlns='urn:xmpp:omemo:2'><device id='abc'/></devices>");
+
+		Assert.ThrowsExactly<XmppException>(() => OmemoDeviceList.Parse(element));
+	}
+
+	[TestMethod]
+	public void DeviceListParsesLegacyPayload() {
+		XmlElement element = LoadElement(
 			"<list xmlns='eu.siacs.conversations.axolotl'>" +
 			"<device id='10'/><device id='20'/></list>");
 
 		OmemoDeviceList deviceList = OmemoDeviceList.Parse(element);
 
 		CollectionAssert.AreEqual(new uint[] { 10, 20 }, deviceList.DeviceIds.ToArray());
-	}
-
-	[TestMethod]
-	public void DeviceListRejectsInvalidDeviceId() {
-		XmlElement element = LoadElement(
-			"<list xmlns='eu.siacs.conversations.axolotl'><device id='abc'/></list>");
-
-		Assert.ThrowsExactly<XmppException>(() => OmemoDeviceList.Parse(element));
 	}
 
 	[TestMethod]
@@ -95,8 +113,91 @@ public sealed class OmemoTests {
 
 	[TestMethod]
 	public void BundleNodeUsesOmemoDeviceId() {
-		Assert.AreEqual("eu.siacs.conversations.axolotl.bundles:123",
+		Assert.AreEqual("urn:xmpp:omemo:2:bundles",
 			Omemo.GetBundleNode(123));
+	}
+
+	[TestMethod]
+	public void PayloadEncryptsAuthenticatesAndDecrypts() {
+		byte[] key = Enumerable.Range(1, 32).Select(i => (byte) i).ToArray();
+		byte[] plaintext = Encoding.UTF8.GetBytes("secret message");
+
+		OmemoPayload payload = OmemoPayload.Encrypt(plaintext, key);
+		byte[] decrypted = payload.Decrypt();
+
+		CollectionAssert.AreEqual(plaintext, decrypted);
+		Assert.HasCount(48, payload.KeyMaterial);
+		CollectionAssert.AreEqual(key, payload.Key);
+	}
+
+	[TestMethod]
+	public void PayloadRejectsTamperedCiphertext() {
+		byte[] key = Enumerable.Range(1, 32).Select(i => (byte) i).ToArray();
+		OmemoPayload payload = OmemoPayload.Encrypt(
+			Encoding.UTF8.GetBytes("secret message"), key);
+		byte[] ciphertext = payload.Ciphertext;
+		ciphertext[0] ^= 0xff;
+		var tampered = new OmemoPayload(payload.Key,
+			payload.AuthenticationTag, ciphertext);
+
+		Assert.ThrowsExactly<CryptographicException>(() => tampered.Decrypt());
+	}
+
+	[TestMethod]
+	public void PayloadCanBeRecreatedFromKeyMaterial() {
+		byte[] key = Enumerable.Range(1, 32).Select(i => (byte) i).ToArray();
+		OmemoPayload payload = OmemoPayload.Encrypt(
+			Encoding.UTF8.GetBytes("secret message"), key);
+
+		OmemoPayload recreated = OmemoPayload.FromKeyMaterial(payload.KeyMaterial,
+			payload.Ciphertext);
+
+		CollectionAssert.AreEqual(payload.Key, recreated.Key);
+		CollectionAssert.AreEqual(payload.AuthenticationTag,
+			recreated.AuthenticationTag);
+		CollectionAssert.AreEqual(payload.Decrypt(), recreated.Decrypt());
+	}
+
+	[TestMethod]
+	public void EncryptedMessageSerializesAndParsesEnvelope() {
+		var encryptedMessage = new OmemoEncryptedMessage(44,
+			new[] {
+				new OmemoRecipientKey("juliet@example.com/balcony", 10,
+					new byte[] { 1, 2, 3 }, keyExchange: true),
+				new OmemoRecipientKey("juliet@example.com", 11,
+					new byte[] { 4, 5, 6 }),
+				new OmemoRecipientKey("romeo@example.com", 12,
+					new byte[] { 7, 8, 9 })
+			},
+			new byte[] { 10, 11, 12 });
+
+		OmemoEncryptedMessage parsed =
+			OmemoEncryptedMessage.Parse(encryptedMessage.ToXmlElement());
+
+		Assert.AreEqual(44u, parsed.SenderDeviceId);
+		Assert.HasCount(3, parsed.Keys);
+		Assert.HasCount(2, parsed.GetKeysFor("juliet@example.com").ToList());
+		Assert.IsTrue(parsed.GetKeysFor("juliet@example.com").First().KeyExchange);
+		CollectionAssert.AreEqual(new byte[] { 10, 11, 12 }, parsed.Payload);
+	}
+
+	[TestMethod]
+	public void EncryptedMessageTryParseReadsMessageStanza() {
+		var message = new Message("juliet@example.com", type: MessageType.Chat);
+		var encryptedMessage = new OmemoEncryptedMessage(44,
+			new[] {
+				new OmemoRecipientKey("juliet@example.com", 10,
+					new byte[] { 1, 2, 3 })
+			},
+			new byte[] { 4, 5, 6 });
+		message.Data.AppendChild(message.Data.OwnerDocument.ImportNode(
+			encryptedMessage.ToXmlElement(), true));
+
+		bool parsed = OmemoEncryptedMessage.TryParse(message, out var result);
+
+		Assert.IsTrue(parsed);
+		Assert.AreEqual(44u, result.SenderDeviceId);
+		CollectionAssert.AreEqual(new byte[] { 4, 5, 6 }, result.Payload);
 	}
 
 	[TestMethod]

@@ -18,14 +18,18 @@ namespace Artalk.Xmpp.Extensions {
 		/// <summary>
 		/// The PEP node used to publish OMEMO device lists.
 		/// </summary>
-		public const string DeviceListNode = Namespace + ".devicelist";
+		public const string DeviceListNode = OmemoDeviceList.Node;
+
+		/// <summary>
+		/// The PEP node used to publish OMEMO bundles.
+		/// </summary>
+		public const string BundleNode = OmemoBundle.Node;
 
 		/// <summary>
 		/// The PEP item id used for OMEMO device lists and bundles.
 		/// </summary>
 		public const string CurrentItemId = "current";
 
-		const string BundleNodePrefix = Namespace + ".bundles:";
 		Pep pep;
 
 		/// <summary>
@@ -66,7 +70,11 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		public void PublishDeviceList(OmemoDeviceList deviceList) {
 			deviceList.ThrowIfNull("deviceList");
-			pep.Publish(DeviceListNode, CurrentItemId, deviceList.ToXmlElement());
+			pep.Publish(DeviceListNode, CurrentItemId,
+				new Dictionary<string, string> {
+					{ "pubsub#access_model", "open" }
+				},
+				deviceList.ToXmlElement());
 		}
 
 		/// <summary>
@@ -75,24 +83,31 @@ namespace Artalk.Xmpp.Extensions {
 		public OmemoDeviceList RetrieveDeviceList(Jid jid) {
 			jid.ThrowIfNull("jid");
 			XmlElement item = pep.RetrieveItem(jid, DeviceListNode, CurrentItemId);
-			return OmemoDeviceList.Parse(RequiredPayload(item, "list"));
+			return OmemoDeviceList.Parse(RequiredPayload(item, "devices"));
 		}
 
 		/// <summary>
 		/// Publishes the local OMEMO bundle for the specified device id.
 		/// </summary>
 		public void PublishBundle(uint deviceId, OmemoBundle bundle) {
+			OmemoDevice.ValidateDeviceId(deviceId, "deviceId");
 			bundle.ThrowIfNull("bundle");
-			pep.Publish(GetBundleNode(deviceId), CurrentItemId, bundle.ToXmlElement());
+			pep.Publish(BundleNode, deviceId.ToString(CultureInfo.InvariantCulture),
+				new Dictionary<string, string> {
+					{ "pubsub#max_items", "max" },
+					{ "pubsub#access_model", "open" }
+				},
+				bundle.ToXmlElement());
 		}
 
 		/// <summary>
 		/// Retrieves an OMEMO bundle for the specified XMPP entity and device id.
 		/// </summary>
 		public OmemoBundle RetrieveBundle(Jid jid, uint deviceId) {
+			OmemoDevice.ValidateDeviceId(deviceId, "deviceId");
 			jid.ThrowIfNull("jid");
-			XmlElement item = pep.RetrieveItem(jid, GetBundleNode(deviceId),
-				CurrentItemId);
+			XmlElement item = pep.RetrieveItem(jid, BundleNode,
+				deviceId.ToString(CultureInfo.InvariantCulture));
 			return OmemoBundle.Parse(RequiredPayload(item, "bundle"));
 		}
 
@@ -100,7 +115,8 @@ namespace Artalk.Xmpp.Extensions {
 		/// Returns the OMEMO bundle PEP node for the specified device id.
 		/// </summary>
 		public static string GetBundleNode(uint deviceId) {
-			return BundleNodePrefix + deviceId.ToString(CultureInfo.InvariantCulture);
+			OmemoDevice.ValidateDeviceId(deviceId, "deviceId");
+			return BundleNode;
 		}
 
 		/// <summary>
@@ -113,7 +129,7 @@ namespace Artalk.Xmpp.Extensions {
 		void OnDeviceListChanged(Jid jid, XmlElement item) {
 			if (item == null)
 				return;
-			XmlElement list = Payload(item, "list");
+			XmlElement list = Payload(item, "devices");
 			if (list == null)
 				return;
 			DeviceListChanged.Raise(this,

@@ -16,6 +16,11 @@ namespace Artalk.Xmpp.Extensions {
 		public const string Namespace = OmemoDeviceList.Namespace;
 
 		/// <summary>
+		/// The PEP node used to publish XEP-0384 OMEMO bundles.
+		/// </summary>
+		public const string Node = Namespace + ":bundles";
+
+		/// <summary>
 		/// The id of the signed pre-key.
 		/// </summary>
 		public uint SignedPreKeyId {
@@ -71,6 +76,7 @@ namespace Artalk.Xmpp.Extensions {
 		public OmemoBundle(uint signedPreKeyId, byte[] signedPreKey,
 			byte[] signedPreKeySignature, byte[] identityKey,
 			IDictionary<uint, byte[]> preKeys) {
+			OmemoDevice.ValidateDeviceId(signedPreKeyId, "signedPreKeyId");
 			signedPreKey.ThrowIfNull("signedPreKey");
 			signedPreKeySignature.ThrowIfNull("signedPreKeySignature");
 			identityKey.ThrowIfNull("identityKey");
@@ -85,7 +91,10 @@ namespace Artalk.Xmpp.Extensions {
 			this.identityKey = (byte[]) identityKey.Clone();
 			this.preKeys = new ReadOnlyDictionary<uint, byte[]>(
 				preKeys.OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key,
-					pair => ClonePreKey(pair.Value)));
+					pair => {
+						OmemoDevice.ValidateDeviceId(pair.Key, "preKeys");
+						return ClonePreKey(pair.Value);
+					}));
 		}
 
 		/// <summary>
@@ -93,19 +102,19 @@ namespace Artalk.Xmpp.Extensions {
 		/// </summary>
 		public XmlElement ToXmlElement() {
 			var bundle = Xml.Element("bundle", Namespace)
-				.Child(Xml.Element("signedPreKeyPublic", Namespace)
-					.Attr("signedPreKeyId",
+				.Child(Xml.Element("spk", Namespace)
+					.Attr("id",
 						SignedPreKeyId.ToString(CultureInfo.InvariantCulture))
 					.Text(Convert.ToBase64String(signedPreKey)))
-				.Child(Xml.Element("signedPreKeySignature", Namespace)
+				.Child(Xml.Element("spks", Namespace)
 					.Text(Convert.ToBase64String(signedPreKeySignature)))
-				.Child(Xml.Element("identityKey", Namespace)
+				.Child(Xml.Element("ik", Namespace)
 					.Text(Convert.ToBase64String(identityKey)));
 
 			var prekeys = Xml.Element("prekeys", Namespace);
 			foreach (var pair in preKeys) {
-				prekeys.Child(Xml.Element("preKeyPublic", Namespace)
-					.Attr("preKeyId", pair.Key.ToString(CultureInfo.InvariantCulture))
+				prekeys.Child(Xml.Element("pk", Namespace)
+					.Attr("id", pair.Key.ToString(CultureInfo.InvariantCulture))
 					.Text(Convert.ToBase64String(pair.Value)));
 			}
 			return bundle.Child(prekeys);
@@ -120,39 +129,37 @@ namespace Artalk.Xmpp.Extensions {
 			if (element.LocalName != "bundle" || element.NamespaceURI != Namespace)
 				throw new XmppException("Expected OMEMO bundle element.");
 
-			XmlElement signedPreKeyElement = RequiredChild(element,
-				"signedPreKeyPublic");
-			string signedPreKeyIdValue =
-				signedPreKeyElement.GetAttribute("signedPreKeyId");
+			XmlElement signedPreKeyElement = RequiredChild(element, "spk");
+			string signedPreKeyIdValue = signedPreKeyElement.GetAttribute("id");
 			if (!UInt32.TryParse(signedPreKeyIdValue, NumberStyles.None,
 				CultureInfo.InvariantCulture, out uint signedPreKeyId)) {
 				throw new XmppException("Invalid OMEMO signed pre-key id: " +
 					signedPreKeyIdValue);
 			}
+			OmemoDevice.ValidateDeviceId(signedPreKeyId, "signedPreKeyId");
 
 			var preKeys = new Dictionary<uint, byte[]>();
 			XmlElement prekeysElement = RequiredChild(element, "prekeys");
 			foreach (XmlNode node in prekeysElement.ChildNodes) {
 				if (node is not XmlElement preKey ||
-					preKey.LocalName != "preKeyPublic" ||
+					preKey.LocalName != "pk" ||
 					preKey.NamespaceURI != Namespace) {
 					continue;
 				}
-				string preKeyIdValue = preKey.GetAttribute("preKeyId");
+				string preKeyIdValue = preKey.GetAttribute("id");
 				if (!UInt32.TryParse(preKeyIdValue, NumberStyles.None,
 					CultureInfo.InvariantCulture, out uint preKeyId)) {
 					throw new XmppException("Invalid OMEMO pre-key id: " +
 						preKeyIdValue);
 				}
+				OmemoDevice.ValidateDeviceId(preKeyId, "preKeyId");
 				preKeys.Add(preKeyId, Convert.FromBase64String(preKey.InnerText));
 			}
 
 			return new OmemoBundle(signedPreKeyId,
 				Convert.FromBase64String(signedPreKeyElement.InnerText),
-				Convert.FromBase64String(RequiredChild(element,
-					"signedPreKeySignature").InnerText),
-				Convert.FromBase64String(RequiredChild(element,
-					"identityKey").InnerText),
+				Convert.FromBase64String(RequiredChild(element, "spks").InnerText),
+				Convert.FromBase64String(RequiredChild(element, "ik").InnerText),
 				preKeys);
 		}
 

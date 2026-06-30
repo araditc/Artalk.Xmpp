@@ -141,8 +141,9 @@
       </ArtalkXmppClient>
       <ArtalkXmppClient name="OmemoDeviceList">
         <example>
-          This example demonstrates how to publish an OMEMO device list and
-          bundle through Personal Eventing Protocol nodes.
+          This example demonstrates how to publish OMEMO device metadata and
+          send an encrypted OMEMO envelope after the session layer has produced
+          encrypted key material for a recipient device.
           <code language="c#">
             string hostname = "artalk.ir",
               username = "myUsername",
@@ -168,6 +169,21 @@
                 });
 
               cl.PublishOmemoBundle(deviceId, bundle);
+
+              byte[] plaintext = Encoding.UTF8.GetBytes("hello");
+              OmemoPayload payload = OmemoPayload.Encrypt(plaintext);
+              byte[] encryptedKeyMaterial = EncryptKeyMaterialForRecipientDevice(
+                payload.KeyMaterial);
+
+              var encrypted = new OmemoEncryptedMessage(
+                senderDeviceId: deviceId,
+                keys: new[] {
+                  new OmemoRecipientKey("ammar@artalk.ir", 654321,
+                    encryptedKeyMaterial)
+                },
+                payload: payload.Ciphertext);
+
+              cl.SendOmemoMessage("ammar@artalk.ir", encrypted);
             }
           </code>
         </example>

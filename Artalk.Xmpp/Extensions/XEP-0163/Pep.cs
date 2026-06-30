@@ -101,6 +101,20 @@ namespace Artalk.Xmpp.Extensions {
 		/// <exception cref="XmppException">The server returned invalid data or another
 		/// unspecified XMPP error occurred.</exception>
 		public void Publish(string node, string itemId = null, params XmlElement[] data) {
+			Publish(node, itemId, null, data);
+		}
+
+		/// <summary>
+		/// Publishes the specified data to the specified node with publish-options.
+		/// </summary>
+		/// <param name="node">The Id of the node to publish to.</param>
+		/// <param name="itemId">The id of the 'item' element which is being
+		/// published.</param>
+		/// <param name="publishOptions">Optional pubsub publish-options fields.</param>
+		/// <param name="data">The data to include in the 'item' element of the
+		/// publish request.</param>
+		public void Publish(string node, string itemId,
+			IDictionary<string, string> publishOptions, params XmlElement[] data) {
 			node.ThrowIfNull("node");
 			if (!Supported) {
 				throw new NotSupportedException("The server does not support publishing " +
@@ -118,6 +132,23 @@ namespace Artalk.Xmpp.Extensions {
 				}
 				if(!item.IsEmpty)
 					xml["publish"].Child(item);
+			}
+			if (publishOptions != null && publishOptions.Count > 0) {
+				var form = Xml.Element("x", "jabber:x:data")
+					.Attr("type", "submit")
+					.Child(Xml.Element("field")
+						.Attr("var", "FORM_TYPE")
+						.Attr("type", "hidden")
+						.Child(Xml.Element("value")
+							.Text("http://jabber.org/protocol/pubsub#publish-options")));
+				foreach (var option in publishOptions) {
+					if (String.IsNullOrEmpty(option.Key))
+						throw new ArgumentException("Publish option keys cannot be empty.",
+							"publishOptions");
+					form.Child(Xml.Element("field").Attr("var", option.Key)
+						.Child(Xml.Element("value").Text(option.Value ?? String.Empty)));
+				}
+				xml.Child(Xml.Element("publish-options").Child(form));
 			}
 			Iq iq = im.IqRequest(IqType.Set, null, im.Jid, xml);
 			if (iq.Type == IqType.Error)

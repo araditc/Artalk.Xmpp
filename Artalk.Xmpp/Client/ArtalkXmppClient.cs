@@ -786,6 +786,23 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// Sends an OMEMO encrypted message envelope.
+		/// </summary>
+		/// <param name="to">The JID of the intended recipient.</param>
+		/// <param name="encryptedMessage">The OMEMO encrypted message envelope.</param>
+		/// <param name="type">The type of the message.</param>
+		public void SendOmemoMessage(Jid to, OmemoEncryptedMessage encryptedMessage,
+			MessageType type = MessageType.Chat) {
+			AssertValid();
+			to.ThrowIfNull("to");
+			encryptedMessage.ThrowIfNull("encryptedMessage");
+			var message = new Message(to, type: type);
+			message.Data.Child(encryptedMessage.ToXmlElement());
+			message.Data.Child(Xml.Element("store", "urn:xmpp:hints"));
+			im.SendMessage(message);
+		}
+
+		/// <summary>
 		/// Joins the specified multi-user chat room using the specified nickname.
 		/// </summary>
 		/// <param name="roomJid">The bare JID of the room to join.</param>

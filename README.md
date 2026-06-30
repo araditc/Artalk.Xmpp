@@ -24,7 +24,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - Entity capabilities
 - XMPP ping
 - Chat state notifications
-- OMEMO foundation: XEP-0384 device list and bundle PEP helpers
+- OMEMO foundation: XEP-0384 device list, bundle, encrypted envelope, and payload crypto helpers
 - User avatar, mood, tune, and activity
 - In-band registration
 - Private XML storage
@@ -36,7 +36,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.8.0
+dotnet add package Artalk.Xmpp --version 2.9.0
 ```
 
 Or reference the project directly:
@@ -123,7 +123,7 @@ When `OAuthBearerToken` is set and the server advertises `OAUTHBEARER`, Artalk.X
 
 ## OMEMO Foundation
 
-Artalk.Xmpp includes the PEP surface needed to publish and retrieve XEP-0384 OMEMO device lists and bundles. This is the account/device discovery layer used by OMEMO clients before message encryption and trust/session management are applied:
+Artalk.Xmpp includes the PEP surface needed to publish and retrieve XEP-0384 OMEMO device lists and bundles, using the current `urn:xmpp:omemo:2` namespace. It also includes the encrypted message envelope model and payload encryption/authentication helper used after the OMEMO session layer has produced per-recipient encrypted key material:
 
 ```csharp
 using Artalk.Xmpp.Client;
@@ -157,7 +157,26 @@ OmemoBundle contactBundle = client.GetOmemoBundle(
     contactDevices.DeviceIds[0]);
 ```
 
-Full OMEMO message encryption, key storage, trust decisions, and session management are intentionally separate from this PEP foundation.
+The payload helper encrypts message bytes with a random OMEMO payload key, exposes the key material that must be encrypted for each recipient device by the session layer, and serializes the resulting envelope:
+
+```csharp
+byte[] plaintext = Encoding.UTF8.GetBytes("hello");
+OmemoPayload payload = OmemoPayload.Encrypt(plaintext);
+
+var encrypted = new OmemoEncryptedMessage(
+    senderDeviceId: deviceId,
+    keys: new[] {
+        new OmemoRecipientKey(
+            "friend@example.com",
+            recipientDeviceId: contactDevices.DeviceIds[0],
+            encryptedKeyMaterial: encryptedKeyMaterialFromSession)
+    },
+    payload: payload.Ciphertext);
+
+client.SendOmemoMessage("friend@example.com", encrypted);
+```
+
+Full OMEMO session management, local key storage, trust decisions, and Double Ratchet key exchange remain intentionally separate from this wire-format and payload-crypto foundation.
 
 ## Presence Tracking
 
@@ -246,7 +265,7 @@ For BOSH, prefer an `https://` connection manager URL so the HTTP binding is pro
 
 OAuth bearer tokens are sent only when the server advertises `OAUTHBEARER`. Use TLS or HTTPS transport when authenticating with bearer tokens.
 
-OMEMO support currently covers device list and bundle publication/retrieval. Applications still need an OMEMO cryptographic/session implementation before sending encrypted user messages.
+OMEMO support currently covers current XEP-0384 device list and bundle publication/retrieval, encrypted message envelope parsing/serialization, and payload encryption/authentication. Applications still need an OMEMO session implementation for per-device key exchange, local key storage, and trust decisions before sending encrypted user messages.
 
 SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. The current channel binding type is `tls-server-end-point`. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
 
