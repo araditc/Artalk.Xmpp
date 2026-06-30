@@ -139,6 +139,39 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="OmemoDeviceList">
+        <example>
+          This example demonstrates how to publish an OMEMO device list and
+          bundle through Personal Eventing Protocol nodes.
+          <code language="c#">
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              password = "myPassword";
+            uint deviceId = 123456;
+
+            using (var cl = new ArtalkXmppClient(hostname, username, password)) {
+              cl.OmemoDeviceListChanged += (sender, e) => {
+                Console.WriteLine(e.Jid + " devices: " +
+                  String.Join(", ", e.DeviceList.DeviceIds));
+              };
+
+              cl.Connect("omemo-device");
+              cl.PublishOmemoDeviceList(new uint[] { deviceId });
+
+              var bundle = new OmemoBundle(
+                signedPreKeyId: 1,
+                signedPreKey: signedPreKeyPublicBytes,
+                signedPreKeySignature: signedPreKeySignatureBytes,
+                identityKey: identityKeyBytes,
+                preKeys: new Dictionary&lt;uint, byte[]&gt; {
+                  { 1, preKeyPublicBytes }
+                });
+
+              cl.PublishOmemoBundle(deviceId, bundle);
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="PresenceTracking">
         <example>
           This example demonstrates how to track contact presence updates.

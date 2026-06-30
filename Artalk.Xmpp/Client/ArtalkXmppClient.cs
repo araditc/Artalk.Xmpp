@@ -124,6 +124,10 @@ namespace Artalk.Xmpp.Client {
 		/// Provides access to the 'Bits of Binary' XMPP extension.
 		/// </summary>
 		BitsOfBinary bitsOfBinary;
+		/// <summary>
+		/// Provides access to the 'OMEMO Encryption' XMPP extension foundation.
+		/// </summary>
+		Omemo omemo;
 
 		/// <summary>
 		/// The hostname of the XMPP server to connect to.
@@ -400,6 +404,19 @@ namespace Artalk.Xmpp.Client {
 			}
 			remove {
 				userTune.Tune -= value;
+			}
+		}
+
+		/// <summary>
+		/// The event that is raised when a contact has published an OMEMO device
+		/// list update.
+		/// </summary>
+		public event EventHandler<OmemoDeviceListChangedEventArgs> OmemoDeviceListChanged {
+			add {
+				omemo.DeviceListChanged += value;
+			}
+			remove {
+				omemo.DeviceListChanged -= value;
 			}
 		}
 
@@ -1129,6 +1146,86 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// Publishes the local OMEMO device list through Personal Eventing Protocol.
+		/// </summary>
+		/// <param name="deviceIds">The local OMEMO device ids to advertise.</param>
+		/// <exception cref="ArgumentNullException">The deviceIds parameter is null.</exception>
+		/// <exception cref="NotSupportedException">The server does not support the
+		/// 'Personal Eventing Protocol' extension.</exception>
+		/// <exception cref="XmppErrorException">The server returned an XMPP error code.
+		/// Use the Error property of the XmppErrorException to obtain the specific
+		/// error condition.</exception>
+		/// <exception cref="XmppException">The server returned invalid data or another
+		/// unspecified XMPP error occurred.</exception>
+		/// <exception cref="InvalidOperationException">The XmppClient instance is not
+		/// connected to a remote host, or the XmppClient instance has not authenticated with
+		/// the XMPP server.</exception>
+		/// <exception cref="ObjectDisposedException">The XmppClient object has been
+		/// disposed.</exception>
+		/// <include file='Examples.xml' path='S22/Xmpp/Client/XmppClient[@name="OmemoDeviceList"]/*'/>
+		public void PublishOmemoDeviceList(IEnumerable<uint> deviceIds) {
+			AssertValid();
+			deviceIds.ThrowIfNull("deviceIds");
+			omemo.PublishDeviceList(new OmemoDeviceList(deviceIds));
+		}
+
+		/// <summary>
+		/// Publishes the local OMEMO device list through Personal Eventing Protocol.
+		/// </summary>
+		/// <param name="deviceList">The local OMEMO device list to advertise.</param>
+		/// <exception cref="ArgumentNullException">The deviceList parameter is null.</exception>
+		/// <exception cref="NotSupportedException">The server does not support the
+		/// 'Personal Eventing Protocol' extension.</exception>
+		/// <exception cref="XmppErrorException">The server returned an XMPP error code.
+		/// Use the Error property of the XmppErrorException to obtain the specific
+		/// error condition.</exception>
+		/// <exception cref="XmppException">The server returned invalid data or another
+		/// unspecified XMPP error occurred.</exception>
+		/// <exception cref="InvalidOperationException">The XmppClient instance is not
+		/// connected to a remote host, or the XmppClient instance has not authenticated with
+		/// the XMPP server.</exception>
+		/// <exception cref="ObjectDisposedException">The XmppClient object has been
+		/// disposed.</exception>
+		public void PublishOmemoDeviceList(OmemoDeviceList deviceList) {
+			AssertValid();
+			deviceList.ThrowIfNull("deviceList");
+			omemo.PublishDeviceList(deviceList);
+		}
+
+		/// <summary>
+		/// Retrieves the OMEMO device list published by the specified XMPP entity.
+		/// </summary>
+		/// <param name="jid">The JID whose OMEMO device list to retrieve.</param>
+		public OmemoDeviceList GetOmemoDeviceList(Jid jid) {
+			AssertValid();
+			jid.ThrowIfNull("jid");
+			return omemo.RetrieveDeviceList(jid);
+		}
+
+		/// <summary>
+		/// Publishes the local OMEMO bundle for the specified device id.
+		/// </summary>
+		/// <param name="deviceId">The local OMEMO device id.</param>
+		/// <param name="bundle">The OMEMO bundle to publish.</param>
+		public void PublishOmemoBundle(uint deviceId, OmemoBundle bundle) {
+			AssertValid();
+			bundle.ThrowIfNull("bundle");
+			omemo.PublishBundle(deviceId, bundle);
+		}
+
+		/// <summary>
+		/// Retrieves the OMEMO bundle published by the specified XMPP entity and
+		/// device id.
+		/// </summary>
+		/// <param name="jid">The JID whose OMEMO bundle to retrieve.</param>
+		/// <param name="deviceId">The OMEMO device id whose bundle to retrieve.</param>
+		public OmemoBundle GetOmemoBundle(Jid jid, uint deviceId) {
+			AssertValid();
+			jid.ThrowIfNull("jid");
+			return omemo.RetrieveBundle(jid, deviceId);
+		}
+
+		/// <summary>
 		/// A callback method to invoke when a request for a file-transfer is received
 		/// from another XMPP user.
 		/// </summary>
@@ -1676,6 +1773,7 @@ namespace Artalk.Xmpp.Client {
 			inBandRegistration = im.LoadExtension<InBandRegistration>();
 			chatStateNotifications = im.LoadExtension<ChatStateNotifications>();
 			bitsOfBinary = im.LoadExtension<BitsOfBinary>();
+			omemo = im.LoadExtension<Omemo>();
 		}
 
 		void RestartKeepAlive() {

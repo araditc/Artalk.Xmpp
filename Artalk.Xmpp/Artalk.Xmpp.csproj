@@ -11,13 +11,13 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <Version>2.7.0</Version>
-    <AssemblyVersion>2.7.0</AssemblyVersion>
+    <Version>2.8.0</Version>
+    <AssemblyVersion>2.8.0</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Add SASL OAUTHBEARER support for OAuth token based XMPP authentication.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add OMEMO device list and bundle PEP helpers as the foundation for XEP-0384 support.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

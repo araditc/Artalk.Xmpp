@@ -24,6 +24,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - Entity capabilities
 - XMPP ping
 - Chat state notifications
+- OMEMO foundation: XEP-0384 device list and bundle PEP helpers
 - User avatar, mood, tune, and activity
 - In-band registration
 - Private XML storage
@@ -35,7 +36,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.7.0
+dotnet add package Artalk.Xmpp --version 2.8.0
 ```
 
 Or reference the project directly:
@@ -119,6 +120,44 @@ client.Connect("oauth-client");
 ```
 
 When `OAuthBearerToken` is set and the server advertises `OAUTHBEARER`, Artalk.Xmpp prefers it over password-based SASL mechanisms.
+
+## OMEMO Foundation
+
+Artalk.Xmpp includes the PEP surface needed to publish and retrieve XEP-0384 OMEMO device lists and bundles. This is the account/device discovery layer used by OMEMO clients before message encryption and trust/session management are applied:
+
+```csharp
+using Artalk.Xmpp.Client;
+using Artalk.Xmpp.Extensions;
+
+using var client = new ArtalkXmppClient("example.com", "myusername", "mypassword");
+
+client.OmemoDeviceListChanged += (sender, e) => {
+    Console.WriteLine($"{e.Jid} devices: {string.Join(", ", e.DeviceList.DeviceIds)}");
+};
+
+client.Connect("omemo-device");
+
+uint deviceId = 123456;
+client.PublishOmemoDeviceList(new uint[] { deviceId });
+
+var bundle = new OmemoBundle(
+    signedPreKeyId: 1,
+    signedPreKey: signedPreKeyPublicBytes,
+    signedPreKeySignature: signedPreKeySignatureBytes,
+    identityKey: identityKeyBytes,
+    preKeys: new Dictionary<uint, byte[]> {
+        { 1, preKeyPublicBytes }
+    });
+
+client.PublishOmemoBundle(deviceId, bundle);
+
+OmemoDeviceList contactDevices = client.GetOmemoDeviceList("friend@example.com");
+OmemoBundle contactBundle = client.GetOmemoBundle(
+    "friend@example.com",
+    contactDevices.DeviceIds[0]);
+```
+
+Full OMEMO message encryption, key storage, trust decisions, and session management are intentionally separate from this PEP foundation.
 
 ## Presence Tracking
 
@@ -206,6 +245,8 @@ STARTTLS now uses the platform certificate validator by default. If a server req
 For BOSH, prefer an `https://` connection manager URL so the HTTP binding is protected by TLS.
 
 OAuth bearer tokens are sent only when the server advertises `OAUTHBEARER`. Use TLS or HTTPS transport when authenticating with bearer tokens.
+
+OMEMO support currently covers device list and bundle publication/retrieval. Applications still need an OMEMO cryptographic/session implementation before sending encrypted user messages.
 
 SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. The current channel binding type is `tls-server-end-point`. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
 

@@ -119,5 +119,10 @@ namespace Artalk.Xmpp.Extensions {
 		/// composing a message, temporarily paused, inactive, or gone.
 		/// </summary>
 		public static string ChatStateNotifications = "ChatStateNotifications";
+		/// <summary>
+		/// An extension for publishing and retrieving OMEMO device lists and
+		/// bundles through Personal Eventing Protocol nodes.
+		/// </summary>
+		public static string Omemo = "Omemo";
 	}
 }
