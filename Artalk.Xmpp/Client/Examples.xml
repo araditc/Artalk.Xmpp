@@ -142,8 +142,8 @@
       <ArtalkXmppClient name="OmemoDeviceList">
         <example>
           This example demonstrates how to publish OMEMO device metadata and
-          send an encrypted OMEMO envelope after the session layer has produced
-          encrypted key material for a recipient device.
+          send an encrypted OMEMO message through a pluggable OMEMO session
+          cipher.
           <code language="c#">
             string hostname = "artalk.ir",
               username = "myUsername",
@@ -170,20 +170,14 @@
 
               cl.PublishOmemoBundle(deviceId, bundle);
 
+              IOmemoSessionCipher sessionCipher = CreateSignalProtocolAdapter();
+              var trustStore = new MemoryOmemoTrustStore();
+              trustStore.SetTrust("ammar@artalk.ir", 654321,
+                recipientIdentityKeyBytes, OmemoTrustLevel.Trusted);
+
               byte[] plaintext = Encoding.UTF8.GetBytes("hello");
-              OmemoPayload payload = OmemoPayload.Encrypt(plaintext);
-              byte[] encryptedKeyMaterial = EncryptKeyMaterialForRecipientDevice(
-                payload.KeyMaterial);
-
-              var encrypted = new OmemoEncryptedMessage(
-                senderDeviceId: deviceId,
-                keys: new[] {
-                  new OmemoRecipientKey("ammar@artalk.ir", 654321,
-                    encryptedKeyMaterial)
-                },
-                payload: payload.Ciphertext);
-
-              cl.SendOmemoMessage("ammar@artalk.ir", encrypted);
+              cl.SendOmemoMessage("ammar@artalk.ir", plaintext, deviceId,
+                sessionCipher, trustStore);
             }
           </code>
         </example>

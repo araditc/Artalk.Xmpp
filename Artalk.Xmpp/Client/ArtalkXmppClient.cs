@@ -803,6 +803,56 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// Encrypts plaintext into an OMEMO envelope for the specified recipients.
+		/// </summary>
+		public OmemoEncryptedMessage EncryptOmemoMessage(uint localDeviceId,
+			IEnumerable<Jid> recipients, byte[] plaintext,
+			IOmemoSessionCipher sessionCipher, IOmemoTrustStore trustStore = null,
+			OmemoTrustPolicy trustPolicy = OmemoTrustPolicy.RequireTrusted,
+			bool includeLocalDevices = true) {
+			AssertValid();
+			recipients.ThrowIfNull("recipients");
+			plaintext.ThrowIfNull("plaintext");
+			sessionCipher.ThrowIfNull("sessionCipher");
+			var manager = new OmemoSessionManager(GetOmemoDeviceList, GetOmemoBundle,
+				sessionCipher, trustStore) {
+				TrustPolicy = trustPolicy,
+				IncludeLocalDevices = includeLocalDevices
+			};
+			return manager.Encrypt(Jid, localDeviceId, recipients, plaintext);
+		}
+
+		/// <summary>
+		/// Encrypts plaintext and sends it as an OMEMO envelope.
+		/// </summary>
+		public void SendOmemoMessage(Jid to, byte[] plaintext, uint localDeviceId,
+			IOmemoSessionCipher sessionCipher, IOmemoTrustStore trustStore = null,
+			OmemoTrustPolicy trustPolicy = OmemoTrustPolicy.RequireTrusted,
+			MessageType type = MessageType.Chat) {
+			AssertValid();
+			to.ThrowIfNull("to");
+			OmemoEncryptedMessage encryptedMessage = EncryptOmemoMessage(
+				localDeviceId, new[] { to }, plaintext, sessionCipher, trustStore,
+				trustPolicy);
+			SendOmemoMessage(to, encryptedMessage, type);
+		}
+
+		/// <summary>
+		/// Decrypts an OMEMO encrypted message for the local device.
+		/// </summary>
+		public byte[] DecryptOmemoMessage(Message message, uint localDeviceId,
+			IOmemoSessionCipher sessionCipher) {
+			AssertValid();
+			message.ThrowIfNull("message");
+			sessionCipher.ThrowIfNull("sessionCipher");
+			if (!OmemoEncryptedMessage.TryParse(message, out var encryptedMessage))
+				throw new XmppException("The message does not contain OMEMO data.");
+			var manager = new OmemoSessionManager(GetOmemoDeviceList, GetOmemoBundle,
+				sessionCipher);
+			return manager.Decrypt(message.From, Jid, localDeviceId, encryptedMessage);
+		}
+
+		/// <summary>
 		/// Joins the specified multi-user chat room using the specified nickname.
 		/// </summary>
 		/// <param name="roomJid">The bare JID of the room to join.</param>

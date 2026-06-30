@@ -201,6 +201,83 @@ public sealed class OmemoTests {
 	}
 
 	[TestMethod]
+	public void MemoryTrustStoreTreatsChangedIdentityAsUntrusted() {
+		var store = new MemoryOmemoTrustStore();
+		var jid = new Jid("juliet@example.com");
+
+		store.SetTrust(jid, 9, new byte[] { 1, 2, 3 }, OmemoTrustLevel.Trusted);
+
+		Assert.AreEqual(OmemoTrustLevel.Trusted,
+			store.GetTrust(jid, 9, new byte[] { 1, 2, 3 }));
+		Assert.AreEqual(OmemoTrustLevel.Untrusted,
+			store.GetTrust(jid, 9, new byte[] { 1, 2, 4 }));
+	}
+
+	[TestMethod]
+	public void SessionManagerRequiresTrustedDevicesByDefault() {
+		var manager = CreateSessionManager(new MemoryOmemoTrustStore());
+
+		Assert.ThrowsExactly<InvalidOperationException>(() => manager.Encrypt(
+			"romeo@example.com", 1, new[] { new Jid("juliet@example.com") },
+			Encoding.UTF8.GetBytes("hello")));
+	}
+
+	[TestMethod]
+	public void SessionManagerTrustOnFirstUseStoresIdentityAndEncrypts() {
+		var trustStore = new MemoryOmemoTrustStore();
+		var cipher = new FakeOmemoSessionCipher();
+		var manager = CreateSessionManager(trustStore, cipher);
+		manager.TrustPolicy = OmemoTrustPolicy.TrustOnFirstUse;
+
+		OmemoEncryptedMessage encrypted = manager.Encrypt("romeo@example.com", 1,
+			new[] { new Jid("juliet@example.com") }, Encoding.UTF8.GetBytes("hello"));
+
+		Assert.HasCount(2, encrypted.Keys);
+		Assert.AreEqual(OmemoTrustLevel.Trusted,
+			trustStore.GetTrust("juliet@example.com", 7, Identity(7)));
+		Assert.AreEqual(OmemoTrustLevel.Trusted,
+			trustStore.GetTrust("romeo@example.com", 2, Identity(2)));
+		CollectionAssert.AreEquivalent(new uint[] { 2, 7 },
+			cipher.EncryptedDeviceIds.ToArray());
+	}
+
+	[TestMethod]
+	public void SessionManagerSkipsLocalSendingDevice() {
+		var trustStore = new MemoryOmemoTrustStore();
+		trustStore.SetTrust("romeo@example.com", 2, Identity(2),
+			OmemoTrustLevel.Trusted);
+		trustStore.SetTrust("juliet@example.com", 7, Identity(7),
+			OmemoTrustLevel.Trusted);
+		var manager = CreateSessionManager(trustStore);
+
+		OmemoEncryptedMessage encrypted = manager.Encrypt("romeo@example.com", 1,
+			new[] { new Jid("juliet@example.com") }, Encoding.UTF8.GetBytes("hello"));
+
+		CollectionAssert.AreEquivalent(new uint[] { 2, 7 },
+			encrypted.Keys.Select(k => k.RecipientDeviceId).ToArray());
+	}
+
+	[TestMethod]
+	public void SessionManagerDecryptsMatchingRecipientKey() {
+		var cipher = new FakeOmemoSessionCipher();
+		byte[] plaintext = Encoding.UTF8.GetBytes("hello secure world");
+		OmemoPayload payload = OmemoPayload.Encrypt(plaintext,
+			Enumerable.Range(1, 32).Select(i => (byte) i).ToArray());
+		var encrypted = new OmemoEncryptedMessage(7,
+			new[] {
+				new OmemoRecipientKey("romeo@example.com", 2,
+					cipher.Wrap(payload.KeyMaterial, 2))
+			},
+			payload.Ciphertext);
+		var manager = CreateSessionManager(sessionCipher: cipher);
+
+		byte[] decrypted = manager.Decrypt("juliet@example.com", "romeo@example.com",
+			2, encrypted);
+
+		CollectionAssert.AreEqual(plaintext, decrypted);
+	}
+
+	[TestMethod]
 	public void DeviceListChangedEventArgsRequiresValues() {
 		var jid = new Jid("juliet@example.com");
 		var deviceList = new OmemoDeviceList(new uint[] { 1 });
@@ -219,5 +296,61 @@ public sealed class OmemoTests {
 		var document = new XmlDocument();
 		document.LoadXml(xml);
 		return document.DocumentElement!;
+	}
+
+	static OmemoSessionManager CreateSessionManager(IOmemoTrustStore? trustStore = null,
+		FakeOmemoSessionCipher? sessionCipher = null) {
+		sessionCipher ??= new FakeOmemoSessionCipher();
+		return new OmemoSessionManager(GetDeviceList, GetBundle, sessionCipher,
+			trustStore);
+	}
+
+	static OmemoDeviceList GetDeviceList(Jid jid) {
+		return jid.GetBareJid().ToString() switch {
+			"romeo@example.com" => new OmemoDeviceList(new uint[] { 1, 2 }),
+			"juliet@example.com" => new OmemoDeviceList(new uint[] { 7 }),
+			_ => new OmemoDeviceList(Array.Empty<uint>())
+		};
+	}
+
+	static OmemoBundle GetBundle(Jid jid, uint deviceId) {
+		return new OmemoBundle(1,
+			new byte[] { 1, 2, 3 },
+			new byte[] { 4, 5, 6 },
+			Identity(deviceId),
+			new Dictionary<uint, byte[]> {
+				{ 1, new byte[] { 7, 8, 9 } }
+			});
+	}
+
+	static byte[] Identity(uint deviceId) {
+		return new[] { (byte) deviceId, (byte) (deviceId + 1) };
+	}
+
+	sealed class FakeOmemoSessionCipher : IOmemoSessionCipher {
+		public List<uint> EncryptedDeviceIds {
+			get;
+		} = new List<uint>();
+
+		public OmemoRecipientKey EncryptKeyMaterial(Jid recipientJid,
+			uint recipientDeviceId, OmemoBundle recipientBundle, byte[] keyMaterial) {
+			EncryptedDeviceIds.Add(recipientDeviceId);
+			return new OmemoRecipientKey(recipientJid, recipientDeviceId,
+				Wrap(keyMaterial, recipientDeviceId));
+		}
+
+		public byte[] DecryptKeyMaterial(Jid senderJid, uint senderDeviceId,
+			OmemoRecipientKey recipientKey) {
+			return recipientKey.EncryptedKeyMaterial.Skip(4).ToArray();
+		}
+
+		public byte[] Wrap(byte[] keyMaterial, uint deviceId) {
+			byte[] output = new byte[keyMaterial.Length + 4];
+			byte[] prefix = BitConverter.GetBytes(deviceId);
+			Buffer.BlockCopy(prefix, 0, output, 0, prefix.Length);
+			Buffer.BlockCopy(keyMaterial, 0, output, prefix.Length,
+				keyMaterial.Length);
+			return output;
+		}
 	}
 }
