@@ -1,5 +1,7 @@
 # Artalk.Xmpp
 
+[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) · 134K+ total downloads
+
 Artalk.Xmpp is a .NET 10 XMPP client library for connecting to XMPP servers, sending and receiving messages, managing presence and rosters, and using common XMPP extension protocols.
 
 ## Supported Runtime
