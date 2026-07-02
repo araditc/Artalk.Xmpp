@@ -17,6 +17,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - TCP XML streams
 - STARTTLS and direct TLS
 - XMPP over BOSH
+- XMPP over WebSocket
 - SASL authentication: OAUTHBEARER, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
@@ -38,7 +39,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.10.0
+dotnet add package Artalk.Xmpp --version 2.11.0
 ```
 
 Or reference the project directly:
@@ -105,6 +106,27 @@ using var client = new ArtalkXmppClient(
 
 client.Connect("bosh-client");
 client.SendMessage("room-user@example.com", "Hello over BOSH");
+```
+
+## WebSocket
+
+For servers that expose RFC 7395 XMPP over WebSocket, pass the WebSocket endpoint URL, the XMPP service domain, and `XmppTransportBinding.WebSocket`:
+
+```csharp
+using Artalk.Xmpp.Client;
+using Artalk.Xmpp.Core;
+
+var webSocketUrl = new Uri("wss://chat.example.com/xmpp-websocket");
+
+using var client = new ArtalkXmppClient(
+    webSocketUrl,
+    "example.com",
+    "myusername",
+    "mypassword",
+    XmppTransportBinding.WebSocket);
+
+client.Connect("websocket-client");
+client.SendMessage("friend@example.com", "Hello over WebSocket");
 ```
 
 ## OAuth Bearer Authentication
@@ -269,6 +291,8 @@ client.Register(form => new SubmitForm(
 STARTTLS now uses the platform certificate validator by default. If a server requires custom certificate validation, pass a `RemoteCertificateValidationCallback` to the client constructor.
 
 For BOSH, prefer an `https://` connection manager URL so the HTTP binding is protected by TLS.
+
+For WebSocket, prefer `wss://` endpoint URLs. RFC 7395 uses the `xmpp` WebSocket subprotocol and sends each stanza as an independent UTF-8 text frame.
 
 OAuth bearer tokens are sent only when the server advertises `OAUTHBEARER`. Use TLS or HTTPS transport when authenticating with bearer tokens.
 

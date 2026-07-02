@@ -141,6 +141,19 @@ namespace Artalk.Xmpp.Im {
 		}
 
 		/// <summary>
+		/// The WebSocket endpoint URL. If this is set, the client connects through
+		/// XMPP over WebSocket instead of a TCP XML stream.
+		/// </summary>
+		public Uri WebSocketUrl {
+			get {
+				return core.WebSocketUrl;
+			}
+			set {
+				core.WebSocketUrl = value;
+			}
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -303,6 +316,21 @@ namespace Artalk.Xmpp.Im {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the XmppIm class for a URI-based XMPP
+		/// transport binding.
+		/// </summary>
+		/// <param name="url">The transport endpoint URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="username">The username with which to authenticate.</param>
+		/// <param name="password">The password with which to authenticate.</param>
+		/// <param name="transportBinding">The URI-based XMPP transport binding.</param>
+		public XmppIm(Uri url, string hostname, string username, string password,
+			XmppTransportBinding transportBinding) {
+			core = new XmppCore(url, hostname, username, password, transportBinding);
+			SetupEventHandlers();
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the XmppIm.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -332,6 +360,18 @@ namespace Artalk.Xmpp.Im {
 		/// <param name="hostname">The XMPP service domain.</param>
 		public XmppIm(Uri boshUrl, string hostname) {
 			core = new XmppCore(boshUrl, hostname);
+			SetupEventHandlers();
+		}
+
+		/// <summary>
+		/// Initializes a new unauthenticated instance of the XmppIm class for a
+		/// URI-based XMPP transport binding.
+		/// </summary>
+		/// <param name="url">The transport endpoint URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="transportBinding">The URI-based XMPP transport binding.</param>
+		public XmppIm(Uri url, string hostname, XmppTransportBinding transportBinding) {
+			core = new XmppCore(url, hostname, transportBinding);
 			SetupEventHandlers();
 		}
 

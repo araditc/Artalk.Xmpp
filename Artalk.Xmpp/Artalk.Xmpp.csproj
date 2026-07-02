@@ -11,13 +11,13 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <Version>2.10.0</Version>
-    <AssemblyVersion>2.10.0</AssemblyVersion>
+    <Version>2.11.0</Version>
+    <AssemblyVersion>2.11.0</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Add OMEMO session orchestration, trust policies, trust store, and pluggable session cipher integration.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add RFC 7395 XMPP over WebSocket transport support.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -228,6 +228,19 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// The WebSocket endpoint URL. If this is set, the client connects through
+		/// XMPP over WebSocket instead of a TCP XML stream.
+		/// </summary>
+		public Uri WebSocketUrl {
+			get {
+				return im.WebSocketUrl;
+			}
+			set {
+				im.WebSocketUrl = value;
+			}
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -612,6 +625,22 @@ namespace Artalk.Xmpp.Client {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the XmppClient class for a URI-based XMPP
+		/// transport binding.
+		/// </summary>
+		/// <param name="url">The transport endpoint URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="username">The username with which to authenticate.</param>
+		/// <param name="password">The password with which to authenticate.</param>
+		/// <param name="transportBinding">The URI-based XMPP transport binding.</param>
+		public ArtalkXmppClient(Uri url, string hostname, string username,
+			string password, Artalk.Xmpp.Core.XmppTransportBinding transportBinding) {
+			im = new XmppIm(url, hostname, username, password, transportBinding);
+			im.Disconnected += (sender, e) => StopKeepAlive();
+			LoadExtensions();
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the XmppClient class.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -644,6 +673,20 @@ namespace Artalk.Xmpp.Client {
 		/// <param name="hostname">The XMPP service domain.</param>
 		public ArtalkXmppClient(Uri boshUrl, string hostname) {
 			im = new XmppIm(boshUrl, hostname);
+			im.Disconnected += (sender, e) => StopKeepAlive();
+			LoadExtensions();
+		}
+
+		/// <summary>
+		/// Initializes a new unauthenticated instance of the XmppClient class for a
+		/// URI-based XMPP transport binding.
+		/// </summary>
+		/// <param name="url">The transport endpoint URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="transportBinding">The URI-based XMPP transport binding.</param>
+		public ArtalkXmppClient(Uri url, string hostname,
+			Artalk.Xmpp.Core.XmppTransportBinding transportBinding) {
+			im = new XmppIm(url, hostname, transportBinding);
 			im.Disconnected += (sender, e) => StopKeepAlive();
 			LoadExtensions();
 		}

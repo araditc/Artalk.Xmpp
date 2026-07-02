@@ -29,8 +29,10 @@ namespace Artalk.Xmpp.Core {
 		/// </summary>
 		Stream stream;
 		BoshTransport bosh;
+		WebSocketTransport webSocket;
 		readonly HttpMessageHandler boshMessageHandler;
 		bool boshStreamOpened;
+		bool webSocketStreamOpened;
 		byte[] tlsServerEndPointChannelBinding;
 		/// <summary>
 		/// The parser instance used for parsing incoming XMPP XML-stream data.
@@ -201,6 +203,15 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		/// <summary>
+		/// The WebSocket endpoint URL. If this is set, the client connects through
+		/// XMPP over WebSocket instead of a TCP XML stream.
+		/// </summary>
+		public Uri WebSocketUrl {
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// A delegate used for verifying the remote Secure Sockets Layer (SSL)
 		/// certificate which is used for authentication.
 		/// </summary>
@@ -338,6 +349,21 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the XmppCore class for a URI-based
+		/// transport binding.
+		/// </summary>
+		/// <param name="url">The transport endpoint URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="username">The username with which to authenticate.</param>
+		/// <param name="password">The password with which to authenticate.</param>
+		/// <param name="transportBinding">The URI-based XMPP transport binding.</param>
+		public XmppCore(Uri url, string hostname, string username,
+			string password, XmppTransportBinding transportBinding)
+			: this(hostname, username, password) {
+			SetTransportUrl(url, transportBinding);
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the XmppCore class.
 		/// </summary>
 		/// <param name="hostname">The hostname of the XMPP server to connect to.</param>
@@ -372,6 +398,18 @@ namespace Artalk.Xmpp.Core {
 			BoshUrl = boshUrl;
 		}
 
+		/// <summary>
+		/// Initializes a new unauthenticated instance of the XmppCore class for a
+		/// URI-based transport binding.
+		/// </summary>
+		/// <param name="url">The transport endpoint URL.</param>
+		/// <param name="hostname">The XMPP service domain.</param>
+		/// <param name="transportBinding">The URI-based XMPP transport binding.</param>
+		public XmppCore(Uri url, string hostname,
+			XmppTransportBinding transportBinding) : this(hostname) {
+			SetTransportUrl(url, transportBinding);
+		}
+
 		internal XmppCore(Uri boshUrl, string hostname, string username,
 			string password, HttpMessageHandler boshMessageHandler)
 			: this(boshUrl, hostname, username, password) {
@@ -401,10 +439,17 @@ namespace Artalk.Xmpp.Core {
 				throw new ObjectDisposedException(GetType().FullName);
 			this.resource = resource;
 			try {
+				if (BoshUrl != null && WebSocketUrl != null)
+					throw new InvalidOperationException("Only one URI-based XMPP transport can be configured.");
 				if (BoshUrl != null) {
 					bosh = new BoshTransport(BoshUrl, Hostname, boshMessageHandler);
 					boshStreamOpened = false;
 					IsEncrypted = bosh.IsEncrypted;
+					tlsServerEndPointChannelBinding = null;
+				} else if (WebSocketUrl != null) {
+					webSocket = new WebSocketTransport(WebSocketUrl, Hostname);
+					webSocketStreamOpened = false;
+					IsEncrypted = webSocket.IsEncrypted;
 					tlsServerEndPointChannelBinding = null;
 				} else {
 					client = new TcpClient(Hostname, Port);
@@ -413,7 +458,7 @@ namespace Artalk.Xmpp.Core {
 					tlsServerEndPointChannelBinding = null;
 				}
 				SessionSupported = false;
-				if (DirectTls && bosh == null)
+				if (DirectTls && bosh == null && webSocket == null)
 					SecureStream(Hostname, Validate);
 				// Sets up the connection which includes TLS and possibly SASL negotiation.
 				SetupConnection(this.resource);
@@ -783,6 +828,9 @@ namespace Artalk.Xmpp.Core {
 					if (bosh != null)
 						bosh.Dispose();
 					bosh = null;
+					if (webSocket != null)
+						webSocket.Dispose();
+					webSocket = null;
 					if (client != null)
 						client.Close();
 					client = null;
@@ -869,6 +917,13 @@ namespace Artalk.Xmpp.Core {
 				XmlElement feats = boshStreamOpened ? bosh.Restart() : bosh.Open();
 				boshStreamOpened = true;
 				Language = bosh.Language ?? new CultureInfo("en");
+				return feats;
+			}
+			if (webSocket != null) {
+				XmlElement feats = webSocketStreamOpened ?
+					webSocket.Restart() : webSocket.Open();
+				webSocketStreamOpened = true;
+				Language = webSocket.Language ?? new CultureInfo("en");
 				return feats;
 			}
 			var xml = Xml.Element("stream:stream", "jabber:client")
@@ -1083,6 +1138,10 @@ namespace Artalk.Xmpp.Core {
 				bosh.Send(xml);
 				return;
 			}
+			if (webSocket != null) {
+				webSocket.Send(xml);
+				return;
+			}
 			// XMPP is guaranteed to be UTF-8.
 			byte[] buf = Encoding.UTF8.GetBytes(xml);
 			lock (writeLock) {
@@ -1167,6 +1226,7 @@ namespace Artalk.Xmpp.Core {
 
 		XmlElement Receive(params string[] expected) {
 			var element = bosh != null ? bosh.Receive(expected) :
+				webSocket != null ? webSocket.Receive(expected) :
 				parser.NextElement(expected);
 			if (element != null) {
 				ReceiveXml.Raise(this, new StanzaXmlEventArgs(element.ToXmlString()));
@@ -1236,11 +1296,27 @@ namespace Artalk.Xmpp.Core {
 			// Close the XML stream.
 			if (bosh != null)
 				bosh.Close();
+			else if (webSocket != null)
+				webSocket.Close();
 			else
 				Send("</stream:stream>");
 			Connected = false;
 			Authenticated = false;
 			Disconnected.Raise(this, new EventArgs());
+		}
+
+		void SetTransportUrl(Uri url, XmppTransportBinding transportBinding) {
+			url.ThrowIfNull("url");
+			switch (transportBinding) {
+				case XmppTransportBinding.Bosh:
+					BoshUrl = url;
+					break;
+				case XmppTransportBinding.WebSocket:
+					WebSocketUrl = url;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException("transportBinding");
+			}
 		}
 	}
 }

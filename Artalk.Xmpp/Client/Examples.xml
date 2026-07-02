@@ -122,6 +122,24 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="WebSocket">
+        <example>
+          This example demonstrates how to connect through an RFC 7395 XMPP
+          WebSocket endpoint.
+          <code language="c#">
+            Uri webSocketUrl = new Uri("wss://chat.artalk.ir/xmpp-websocket");
+            string hostname = "artalk.ir",
+              username = "myUsername",
+              password = "myPassword";
+
+            using (var cl = new ArtalkXmppClient(webSocketUrl, hostname,
+              username, password, XmppTransportBinding.WebSocket)) {
+              cl.Connect("websocket-client");
+              cl.SendMessage("ammar@artalk.ir", "Hello over WebSocket");
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="OAuthBearer">
         <example>
           This example demonstrates how to authenticate with a server that
