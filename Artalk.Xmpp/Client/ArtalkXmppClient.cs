@@ -589,6 +589,8 @@ namespace Artalk.Xmpp.Client {
 		/// <param name="port">The port number of the XMPP service of the server.</param>
 		/// <param name="tls">If true the session will be TLS/SSL-encrypted if the server
 		/// supports TLS/SSL-encryption.</param>
+		/// <param name="directTls">If true TLS/SSL is negotiated immediately after
+		/// opening the TCP connection.</param>
 		/// <param name="validate">A delegate used for verifying the remote Secure Sockets
 		/// Layer (SSL) certificate which is used for authentication. Can be null if not
 		/// needed.</param>
@@ -647,6 +649,8 @@ namespace Artalk.Xmpp.Client {
 		/// <param name="port">The port number of the XMPP service of the server.</param>
 		/// <param name="tls">If true the session will be TLS/SSL-encrypted if the server
 		/// supports TLS/SSL-encryption.</param>
+		/// <param name="directTls">If true TLS/SSL is negotiated immediately after
+		/// opening the TCP connection.</param>
 		/// <param name="validate">A delegate used for verifying the remote Secure Sockets
 		/// Layer (SSL) certificate which is used for authentication. Can be null if not
 		/// needed.</param>

@@ -88,6 +88,19 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="JidNormalization">
+        <example>
+          This example demonstrates RFC 7622-oriented JID normalization.
+          <code language="c#">
+            Jid jid = "USER@XN--BCHER-KVA.Example./Phone";
+
+            Console.WriteLine(jid.Node);     // user
+            Console.WriteLine(jid.Domain);   // bücher.example
+            Console.WriteLine(jid.Resource); // Phone
+            Console.WriteLine(jid);          // user@bücher.example/Phone
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="DirectTls">
         <example>
           This example demonstrates how to connect to a server that expects TLS

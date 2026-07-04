@@ -1,6 +1,6 @@
 # Artalk.Xmpp
 
-[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) - 135,617 total downloads as of 2026-07-02
+[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) - 136,594 total downloads as of 2026-07-04
 
 Artalk.Xmpp is a .NET 10 XMPP client library for connecting to XMPP servers, sending and receiving messages, managing presence and rosters, and using common XMPP extension protocols.
 
@@ -15,6 +15,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 ## Supported XMPP Features
 
 - TCP XML streams
+- RFC 7622-oriented JID parsing, IDN domain normalization, and PRECIS-profile checks
 - STARTTLS and direct TLS
 - XMPP over BOSH
 - XMPP over WebSocket
@@ -39,7 +40,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.11.0
+dotnet add package Artalk.Xmpp --version 2.12.0
 ```
 
 Or reference the project directly:
@@ -72,6 +73,19 @@ client.Message += (sender, e) => {
 
 client.Connect("my-resource");
 client.SendMessage("friend@example.com", "Hello from Artalk.Xmpp", type: MessageType.Chat);
+```
+
+## JID Normalization
+
+`Jid` normalizes XMPP addresses before comparison and serialization. Domainparts are processed as IDN-aware names, localparts apply RFC 7622-oriented case, width, exclusion, and length checks, and resourceparts are treated as opaque strings with NFC normalization:
+
+```csharp
+var jid = new Jid("USER@XN--BCHER-KVA.Example./Phone");
+
+Console.WriteLine(jid.Node);     // user
+Console.WriteLine(jid.Domain);   // bücher.example
+Console.WriteLine(jid.Resource); // Phone
+Console.WriteLine(jid);          // user@bücher.example/Phone
 ```
 
 ## Direct TLS

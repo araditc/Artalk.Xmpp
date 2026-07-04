@@ -1,6 +1,7 @@
-﻿using System;
+using System;
+using System.Globalization;
+using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Artalk.Xmpp {
 	/// <summary>
@@ -8,6 +9,12 @@ namespace Artalk.Xmpp {
 	/// </summary>
 	[Serializable]
 	public sealed class Jid {
+		const int MaxPartOctets = 1023;
+		static readonly char[] LocalpartExcludedChars = { '"', '&', '\'', '/', ':', '<', '>', '@' };
+		static readonly IdnMapping Idn = new IdnMapping {
+			UseStd3AsciiRules = true
+		};
+
 		/// <summary>
 		/// The domain identifier of the JID.
 		/// </summary>
@@ -38,8 +45,7 @@ namespace Artalk.Xmpp {
 		/// </summary>
 		public bool IsBareJid {
 			get {
-				return !String.IsNullOrEmpty(Node) &&
-					!String.IsNullOrEmpty(Domain) && String.IsNullOrEmpty(Resource);
+				return !String.IsNullOrEmpty(Domain) && String.IsNullOrEmpty(Resource);
 			}
 		}
 
@@ -49,8 +55,7 @@ namespace Artalk.Xmpp {
 		/// </summary>
 		public bool IsFullJid {
 			get {
-				return !String.IsNullOrEmpty(Node) &&
-					!String.IsNullOrEmpty(Domain) && !String.IsNullOrEmpty(Resource);
+				return !String.IsNullOrEmpty(Domain) && !String.IsNullOrEmpty(Resource);
 			}
 		}
 
@@ -64,17 +69,10 @@ namespace Artalk.Xmpp {
 		/// represent a valid JID.</exception>
 		public Jid(string jid) {
 			jid.ThrowIfNullOrEmpty("jid");
-			Match m = Regex.Match(jid,
-				"^(?:(?<node>[^@/]+)@)?(?<domain>[^@/]+)(?:/(?<resource>.+))?$");
-			if (!m.Success)
-				throw new ArgumentException("The argument is not a valid JID.");
-			Domain = m.Groups["domain"].Value;
-			Node = m.Groups["node"].Value;
-			if (Node == String.Empty)
-				Node = null;
-			Resource = m.Groups["resource"].Value;
-			if (Resource == String.Empty)
-				Resource = null;
+			Parse(jid, out string domain, out string node, out string resource);
+			Domain = domain;
+			Node = node;
+			Resource = resource;
 		}
 
 		/// <summary>
@@ -89,9 +87,128 @@ namespace Artalk.Xmpp {
 		/// empty string.</exception>
 		public Jid(string domain, string node, string resource = null) {
 			domain.ThrowIfNullOrEmpty("domain");
-			Domain = domain;
-			Node = node;
-			Resource = resource;
+			Domain = NormalizeDomainpart(domain);
+			Node = node != null ? NormalizeLocalpart(node) : null;
+			Resource = resource != null ? NormalizeResourcepart(resource) : null;
+		}
+
+		static void Parse(string jid, out string domain, out string node,
+			out string resource) {
+			int slash = jid.IndexOf('/');
+			string address = slash >= 0 ? jid.Substring(0, slash) : jid;
+			resource = slash >= 0 ? jid.Substring(slash + 1) : null;
+			if (resource == String.Empty)
+				throw new ArgumentException("The resourcepart must not be empty.");
+
+			int at = address.IndexOf('@');
+			if (at >= 0) {
+				node = address.Substring(0, at);
+				domain = address.Substring(at + 1);
+				if (node == String.Empty)
+					throw new ArgumentException("The localpart must not be empty.");
+				if (domain.IndexOf('@') >= 0)
+					throw new ArgumentException("The domainpart must not contain '@'.");
+			} else {
+				node = null;
+				domain = address;
+			}
+
+			domain = NormalizeDomainpart(domain);
+			node = node != null ? NormalizeLocalpart(node) : null;
+			resource = resource != null ? NormalizeResourcepart(resource) : null;
+		}
+
+		static string NormalizeDomainpart(string domain) {
+			domain.ThrowIfNullOrEmpty("domain");
+			string value = domain.TrimEnd('.');
+			if (value == String.Empty)
+				throw new ArgumentException("The domainpart must not be empty.");
+			if (value.IndexOfAny(new[] { '@', '/' }) >= 0)
+				throw new ArgumentException("The domainpart contains an invalid separator.");
+
+			string normalized = NormalizeIpLiteral(value) ?? NormalizeDomainName(value);
+			EnsureOctetLength(normalized, "domainpart");
+			return normalized;
+		}
+
+		static string NormalizeDomainName(string domain) {
+			try {
+				string ascii = Idn.GetAscii(domain);
+				string unicode = Idn.GetUnicode(ascii);
+				return unicode.Normalize(NormalizationForm.FormC).ToLowerInvariant();
+			} catch (ArgumentException ex) {
+				throw new ArgumentException("The domainpart is not a valid IDN hostname.", ex);
+			}
+		}
+
+		static string NormalizeIpLiteral(string domain) {
+			if (IPAddress.TryParse(domain, out IPAddress address))
+				return address.ToString().ToLowerInvariant();
+
+			if (domain.Length > 2 && domain[0] == '[' && domain[domain.Length - 1] == ']') {
+				string literal = domain.Substring(1, domain.Length - 2);
+				if (IPAddress.TryParse(literal, out address) &&
+					address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+					return "[" + address + "]";
+			}
+			return null;
+		}
+
+		static string NormalizeLocalpart(string localpart) {
+			localpart.ThrowIfNullOrEmpty("localpart");
+			if (localpart.IndexOfAny(LocalpartExcludedChars) >= 0)
+				throw new ArgumentException("The localpart contains a character excluded by RFC 7622.");
+
+			string normalized = localpart.Normalize(NormalizationForm.FormKC)
+				.ToLowerInvariant()
+				.Normalize(NormalizationForm.FormC);
+			EnsureIdentifierCodePoints(normalized, "localpart");
+			EnsureOctetLength(normalized, "localpart");
+			return normalized;
+		}
+
+		static string NormalizeResourcepart(string resourcepart) {
+			resourcepart.ThrowIfNullOrEmpty("resourcepart");
+			string mapped = MapNonAsciiSpaces(resourcepart)
+				.Normalize(NormalizationForm.FormC);
+			EnsureIdentifierCodePoints(mapped, "resourcepart");
+			EnsureOctetLength(mapped, "resourcepart");
+			return mapped;
+		}
+
+		static string MapNonAsciiSpaces(string value) {
+			StringBuilder builder = null;
+			for (int i = 0; i < value.Length; i++) {
+				if (value[i] != ' ' &&
+					CharUnicodeInfo.GetUnicodeCategory(value, i) == UnicodeCategory.SpaceSeparator) {
+					if (builder == null)
+						builder = new StringBuilder(value);
+					builder[i] = ' ';
+				}
+			}
+			return builder != null ? builder.ToString() : value;
+		}
+
+		static void EnsureIdentifierCodePoints(string value, string partName) {
+			for (int i = 0; i < value.Length; i++) {
+				char c = value[i];
+				if (Char.IsHighSurrogate(c)) {
+					if (i + 1 >= value.Length || !Char.IsLowSurrogate(value[i + 1]))
+						throw new ArgumentException("The " + partName + " contains an invalid Unicode surrogate.");
+					i++;
+					continue;
+				}
+				if (Char.IsLowSurrogate(c))
+					throw new ArgumentException("The " + partName + " contains an invalid Unicode surrogate.");
+				if (Char.IsControl(c))
+					throw new ArgumentException("The " + partName + " must not contain control characters.");
+			}
+		}
+
+		static void EnsureOctetLength(string value, string partName) {
+			int octets = Encoding.UTF8.GetByteCount(value);
+			if (octets == 0 || octets > MaxPartOctets)
+				throw new ArgumentException("The " + partName + " must be between 1 and 1023 UTF-8 octets.");
 		}
 
 		/// <summary>
