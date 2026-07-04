@@ -12,14 +12,14 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <PackageTags>xmpp;jabber;net10;sasl;scram;omemo;bosh;websocket</PackageTags>
-    <Version>2.12.0</Version>
-    <AssemblyVersion>2.12.0</AssemblyVersion>
+    <PackageTags>xmpp;jabber;net10;sasl;scram;omemo;bosh;websocket;xep-0454</PackageTags>
+    <Version>2.13.0</Version>
+    <AssemblyVersion>2.13.0</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Add RFC 7622-oriented JID normalization, CI packaging hardening, SourceLink metadata, and NuGet README polish.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add XEP-0454 OMEMO Media Sharing helpers for aesgcm URIs, AES-256-GCM media encryption, strict body parsing, and JPEG thumbnails.</PackageReleaseNotes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <Deterministic>true</Deterministic>

@@ -213,6 +213,27 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="OmemoMediaSharing">
+        <example>
+          This example demonstrates how to prepare an XEP-0454 OMEMO media
+          sharing body after encrypting a file for HTTP upload.
+          <code language="c#">
+            Uri uploadUrl = new Uri("https://upload.artalk.ir/files/photo.jpg");
+            byte[] fileBytes = File.ReadAllBytes("photo.jpg");
+
+            OmemoMediaUri mediaUri = OmemoMediaUri.Create(uploadUrl);
+            byte[] encryptedFile = mediaUri.Encrypt(fileBytes);
+            long encryptedSize = OmemoMediaUri.GetEncryptedLength(fileBytes.LongLength);
+
+            // Request an HTTP upload slot for encryptedSize bytes and upload
+            // encryptedFile to uploadUrl before sending the OMEMO body.
+            string body = new OmemoMediaMessage(mediaUri).ToString();
+
+            cl.SendOmemoMessage("ammar@artalk.ir",
+              Encoding.UTF8.GetBytes(body), deviceId, sessionCipher, trustStore);
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="PresenceTracking">
         <example>
           This example demonstrates how to track contact presence updates.

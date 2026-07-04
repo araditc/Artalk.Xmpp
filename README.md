@@ -1,6 +1,6 @@
 # Artalk.Xmpp
 
-[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) - 136,594 total downloads as of 2026-07-04
+[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) - 136,958 total downloads as of 2026-07-04
 
 Artalk.Xmpp is a .NET 10 XMPP client library for connecting to XMPP servers, sending and receiving messages, managing presence and rosters, and using common XMPP extension protocols.
 
@@ -29,6 +29,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - XMPP ping
 - Chat state notifications
 - OMEMO foundation: XEP-0384 device list, bundle, trust/session orchestration, encrypted envelope, and payload crypto helpers
+- OMEMO media sharing: XEP-0454 `aesgcm://` URIs, AES-256-GCM media encryption, strict body parsing, and JPEG thumbnails
 - User avatar, mood, tune, and activity
 - In-band registration
 - Private XML storage
@@ -40,7 +41,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.12.0
+dotnet add package Artalk.Xmpp --version 2.13.0
 ```
 
 Or reference the project directly:
@@ -221,6 +222,45 @@ client.SendOmemoMessage(
 
 `OmemoTrustPolicy.RequireTrusted` is the default. `AllowUndecided` and `TrustOnFirstUse` are available when an application explicitly wants that behavior. Artalk.Xmpp does not bundle a GPL Signal Protocol dependency into the MIT package; instead, `IOmemoSessionCipher` is the adapter boundary for a vetted session implementation and persistent key store.
 
+## OMEMO Media Sharing
+
+XEP-0454 uses HTTP File Upload for the encrypted bytes and sends only an `aesgcm://` URL inside an OMEMO encrypted message body. `OmemoMediaUri` creates and parses the strict URI form, encrypts media with AES-256-GCM, and appends the authentication tag to the encrypted file as required by the XEP:
+
+```csharp
+using System.Text;
+using Artalk.Xmpp.Extensions;
+
+Uri uploadUrl = new Uri("https://upload.example.com/files/photo.jpg");
+byte[] fileBytes = File.ReadAllBytes("photo.jpg");
+
+OmemoMediaUri mediaUri = OmemoMediaUri.Create(uploadUrl);
+byte[] encryptedFile = mediaUri.Encrypt(fileBytes);
+long encryptedSize = OmemoMediaUri.GetEncryptedLength(fileBytes.LongLength);
+
+// Upload encryptedFile to uploadUrl. Use encryptedSize when requesting an
+// HTTP upload slot for the encrypted payload.
+
+string thumbnail = OmemoMediaMessage.CreateJpegThumbnailDataUri(thumbnailJpegBytes);
+string body = new OmemoMediaMessage(mediaUri, thumbnail).ToString();
+
+client.SendOmemoMessage(
+    "friend@example.com",
+    Encoding.UTF8.GetBytes(body),
+    localDeviceId: deviceId,
+    sessionCipher: sessionCipher,
+    trustStore: trustStore);
+```
+
+Receiving applications decrypt the OMEMO message first, parse the media body strictly, download the encrypted HTTPS payload, and then decrypt it with the key and IV from the `aesgcm://` URI:
+
+```csharp
+byte[] bodyBytes = client.DecryptOmemoMessage(message, deviceId, sessionCipher);
+OmemoMediaMessage media = OmemoMediaMessage.Parse(Encoding.UTF8.GetString(bodyBytes));
+
+byte[] encryptedDownload = Download(media.MediaUri.HttpsUrl);
+byte[] originalFile = media.MediaUri.Decrypt(encryptedDownload);
+```
+
 ## Presence Tracking
 
 `Connect` retrieves the roster and sends initial presence. Subscribe to `StatusChanged` before connecting to track online, away, and offline updates from contacts:
@@ -311,6 +351,8 @@ For WebSocket, prefer `wss://` endpoint URLs. RFC 7395 uses the `xmpp` WebSocket
 OAuth bearer tokens are sent only when the server advertises `OAUTHBEARER`. Use TLS or HTTPS transport when authenticating with bearer tokens.
 
 OMEMO support covers current XEP-0384 device list and bundle publication/retrieval, trust policies, trust-store integration, encrypted message envelope parsing/serialization, payload encryption/authentication, and send/decrypt orchestration. Applications must provide a vetted `IOmemoSessionCipher` adapter and persistent OMEMO key/session store for per-device X3DH and Double Ratchet state.
+
+OMEMO media sharing support covers XEP-0454 `aesgcm://` URL creation/parsing, AES-256-GCM encryption/decryption, appended authentication tags, strict message-body parsing, and optional JPEG thumbnails. Do not display `aesgcm://` links as browser-openable URLs; the URI fragment contains encryption key material and must stay inside the OMEMO-encrypted message flow. Only HTTPS download/upload URLs are accepted when creating media URIs.
 
 SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. The current channel binding type is `tls-server-end-point`. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
 
