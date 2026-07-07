@@ -1,9 +1,11 @@
 using Artalk.Xmpp.Core.Sasl;
 using Artalk.Xmpp.Core.Sasl.Mechanisms;
 using Artalk.Xmpp.Core;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Xml;
 
 namespace Artalk.Xmpp.Tests;
 
@@ -129,5 +131,74 @@ public sealed class SaslScramSha256Tests {
 
 		CollectionAssert.AreEqual(SHA384.HashData(certificate.RawData),
 			channelBinding);
+	}
+
+	[TestMethod]
+	public void SelectMechanismUsesScramPlusWhenXep0440AdvertisesTlsServerEndPoint() {
+		var core = CreateCoreWithChannelBinding();
+
+		string mechanism = SelectMechanism(core,
+			new[] { "SCRAM-SHA-256", "SCRAM-SHA-256-PLUS" },
+			new[] { ChannelBinding.TlsServerEndPoint });
+
+		Assert.AreEqual("SCRAM-SHA-256-PLUS", mechanism);
+	}
+
+	[TestMethod]
+	public void SelectMechanismFallsBackWhenXep0440AdvertisesUnsupportedBinding() {
+		var core = CreateCoreWithChannelBinding();
+
+		string mechanism = SelectMechanism(core,
+			new[] { "SCRAM-SHA-256", "SCRAM-SHA-256-PLUS" },
+			new[] { "tls-exporter" });
+
+		Assert.AreEqual("SCRAM-SHA-256", mechanism);
+	}
+
+	[TestMethod]
+	public void SelectMechanismRejectsChannelBindingTypesWithoutPlusMechanisms() {
+		var core = CreateCoreWithChannelBinding();
+
+		Assert.ThrowsExactly<TargetInvocationException>(() => SelectMechanism(core,
+			new[] { "SCRAM-SHA-256" },
+			new[] { ChannelBinding.TlsServerEndPoint }));
+	}
+
+	[TestMethod]
+	public void ChannelBindingTypesParseFromStreamFeatures() {
+		var document = new XmlDocument();
+		document.LoadXml(
+			"<stream:features xmlns:stream='http://etherx.jabber.org/streams'>" +
+			"<sasl-channel-binding xmlns='urn:xmpp:sasl-cb:0'>" +
+			"<channel-binding type='tls-server-end-point'/>" +
+			"<channel-binding type='tls-exporter'/>" +
+			"</sasl-channel-binding>" +
+			"</stream:features>");
+		MethodInfo method = typeof(XmppCore).GetMethod("GetChannelBindingTypes",
+			BindingFlags.Static | BindingFlags.NonPublic)!;
+
+		var types = (HashSet<string>) method.Invoke(null,
+			new object[] { document.DocumentElement! })!;
+
+		CollectionAssert.AreEquivalent(new[] {
+			ChannelBinding.TlsServerEndPoint,
+			"tls-exporter"
+		}, types.ToArray());
+	}
+
+	static XmppCore CreateCoreWithChannelBinding() {
+		var core = new XmppCore("example.com", "user", "password");
+		FieldInfo field = typeof(XmppCore).GetField("tlsServerEndPointChannelBinding",
+			BindingFlags.Instance | BindingFlags.NonPublic)!;
+		field.SetValue(core, new byte[] { 1, 2, 3, 4 });
+		return core;
+	}
+
+	static string SelectMechanism(XmppCore core, string[] mechanisms,
+		string[] channelBindingTypes) {
+		MethodInfo method = typeof(XmppCore).GetMethod("SelectMechanism",
+			BindingFlags.Instance | BindingFlags.NonPublic)!;
+		return (string) method.Invoke(core,
+			new object[] { mechanisms, channelBindingTypes })!;
 	}
 }

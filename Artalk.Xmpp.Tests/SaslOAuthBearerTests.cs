@@ -64,6 +64,6 @@ public sealed class SaslOAuthBearerTests {
 	static string SelectMechanism(XmppCore core, params string[] mechanisms) {
 		MethodInfo method = typeof(XmppCore).GetMethod("SelectMechanism",
 			BindingFlags.Instance | BindingFlags.NonPublic)!;
-		return (string) method.Invoke(core, new object[] { mechanisms })!;
+		return (string) method.Invoke(core, new object?[] { mechanisms, null })!;
 	}
 }

@@ -890,9 +890,11 @@ namespace Artalk.Xmpp.Core {
 					list.Add(mech.InnerText);
 				mech = mech.NextSibling;
 			}
+			HashSet<string> channelBindingTypes = GetChannelBindingTypes(feats);
 			// Continue with SASL authentication.
 			try {
-				feats = Authenticate(list, Username, Password, Hostname);
+				feats = Authenticate(list, channelBindingTypes, Username, Password,
+					Hostname);
 				SessionSupported = feats["session"] != null;
 				// FIXME: How is the client's JID constructed if the server does not support
 				// resource binding?
@@ -989,6 +991,9 @@ namespace Artalk.Xmpp.Core {
 		/// </summary>
 		/// <param name="mechanisms">An enumerable collection of SASL mechanisms
 		/// supported by the server.</param>
+		/// <param name="channelBindingTypes">An enumerable collection of SASL
+		/// channel-binding types advertised by XEP-0440, or null if the feature was
+		/// not advertised.</param>
 		/// <param name="username">The username to authenticate with.</param>
 		/// <param name="password">The password to authenticate with.</param>
 		/// <param name="hostname">The hostname of the XMPP server.</param>
@@ -1002,9 +1007,10 @@ namespace Artalk.Xmpp.Core {
 		/// XML-stream in it's 'xml:lang' attribute could not be found.</exception>
 		/// <exception cref="IOException">There was a failure while writing to the
 		/// network, or there was a failure while reading from the network.</exception>
-		XmlElement Authenticate(IEnumerable<string> mechanisms, string username,
-			string password, string hostname) {
-				string name = SelectMechanism(mechanisms);
+		XmlElement Authenticate(IEnumerable<string> mechanisms,
+			IEnumerable<string> channelBindingTypes, string username, string password,
+			string hostname) {
+				string name = SelectMechanism(mechanisms, channelBindingTypes);
 				SaslMechanism m = SaslFactory.Create(name);
 				m.Properties.Add("Username", username);
 				m.Properties.Add("Password", password);
@@ -1053,15 +1059,37 @@ namespace Artalk.Xmpp.Core {
 		/// </summary>
 		/// <param name="mechanisms">An enumerable collection of SASL mechanisms
 		/// advertised by the server.</param>
+		/// <param name="channelBindingTypes">An enumerable collection of SASL
+		/// channel-binding types advertised by XEP-0440, or null if the feature was
+		/// not advertised.</param>
 		/// <returns>The IANA name of the selcted SASL mechanism.</returns>
 		/// <exception cref="SaslException">No supported mechanism could be found in
 		/// the list of mechanisms advertised by the server.</exception>
-		string SelectMechanism(IEnumerable<string> mechanisms) {
+		string SelectMechanism(IEnumerable<string> mechanisms,
+			IEnumerable<string> channelBindingTypes) {
+			mechanisms.ThrowIfNull("mechanisms");
+			HashSet<string> advertisedMechanisms = new HashSet<string>(mechanisms,
+				StringComparer.InvariantCultureIgnoreCase);
+			HashSet<string> advertisedChannelBindingTypes =
+				channelBindingTypes == null ? null : new HashSet<string>(
+					channelBindingTypes, StringComparer.InvariantCultureIgnoreCase);
+			bool channelBindingFeatureAdvertised = advertisedChannelBindingTypes != null;
+			bool plusMechanismAdvertised = advertisedMechanisms.Any(mechanism =>
+				mechanism.EndsWith("-PLUS", StringComparison.InvariantCultureIgnoreCase));
+			if (channelBindingFeatureAdvertised &&
+				advertisedChannelBindingTypes.Count > 0 &&
+				!plusMechanismAdvertised) {
+				throw new SaslException("The server advertised SASL channel-binding " +
+					"types but no channel-binding SASL mechanism.");
+			}
 			var m = new List<string>();
 			if (!String.IsNullOrEmpty(OAuthBearerToken))
 				m.Add("OAUTHBEARER");
 			if (Password != null) {
-				if (tlsServerEndPointChannelBinding != null) {
+				if (tlsServerEndPointChannelBinding != null &&
+					(!channelBindingFeatureAdvertised ||
+					advertisedChannelBindingTypes.Contains(
+						ChannelBinding.TlsServerEndPoint))) {
 					m.Add("SCRAM-SHA3-512-PLUS");
 					m.Add("SCRAM-SHA-512-PLUS");
 					m.Add("SCRAM-SHA-384-PLUS");
@@ -1081,10 +1109,34 @@ namespace Artalk.Xmpp.Core {
 				});
 			}
 			for (int i = 0; i < m.Count; i++) {
-				if (mechanisms.Contains(m[i], StringComparer.InvariantCultureIgnoreCase))
+				if (advertisedMechanisms.Contains(m[i]))
 					return m[i];
 			}
 			throw new SaslException("No supported SASL mechanism found.");
+		}
+
+		static HashSet<string> GetChannelBindingTypes(XmlElement features) {
+			features.ThrowIfNull("features");
+			foreach (XmlNode node in features.ChildNodes) {
+				if (node is not XmlElement element ||
+					element.LocalName != "sasl-channel-binding" ||
+					element.NamespaceURI != ChannelBinding.Namespace) {
+					continue;
+				}
+				var types = new HashSet<string>(
+					StringComparer.InvariantCultureIgnoreCase);
+				foreach (XmlNode childNode in element.ChildNodes) {
+					if (childNode is XmlElement child &&
+						child.LocalName == "channel-binding" &&
+						child.NamespaceURI == ChannelBinding.Namespace) {
+						string type = child.GetAttribute("type");
+						if (!String.IsNullOrWhiteSpace(type))
+							types.Add(type);
+					}
+				}
+				return types;
+			}
+			return null;
 		}
 
 		/// <summary>
