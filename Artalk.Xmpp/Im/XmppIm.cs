@@ -104,6 +104,19 @@ namespace Artalk.Xmpp.Im {
 		}
 
 		/// <summary>
+		/// A caller-provided Cisco VTG token for SASL CISCO-VTG-TOKEN
+		/// authentication.
+		/// </summary>
+		public string CiscoVtgToken {
+			get {
+				return core.CiscoVtgToken;
+			}
+			set {
+				core.CiscoVtgToken = value;
+			}
+		}
+
+		/// <summary>
 		/// If true the session will be TLS/SSL-encrypted if the server supports it.
 		/// </summary>
 		public bool Tls {

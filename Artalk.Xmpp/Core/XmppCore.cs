@@ -64,6 +64,7 @@ namespace Artalk.Xmpp.Core {
 		/// </summary>
 		string password;
 		string oauthBearerToken;
+		string ciscoVtgToken;
 		/// <summary>
 		/// The resource to use for binding.
 		/// </summary>
@@ -175,6 +176,19 @@ namespace Artalk.Xmpp.Core {
 			}
 			set {
 				oauthBearerToken = value;
+			}
+		}
+
+		/// <summary>
+		/// A caller-provided Cisco VTG token for SASL CISCO-VTG-TOKEN
+		/// authentication.
+		/// </summary>
+		public string CiscoVtgToken {
+			get {
+				return ciscoVtgToken;
+			}
+			set {
+				ciscoVtgToken = value;
 			}
 		}
 
@@ -1117,6 +1131,8 @@ namespace Artalk.Xmpp.Core {
 					m.Properties.Add("Hostname", hostname);
 					m.Properties.Add("Port", Port);
 				}
+				if (!String.IsNullOrEmpty(CiscoVtgToken))
+					m.Properties.Add("CiscoVtgToken", CiscoVtgToken);
 				if (name.EndsWith("-PLUS", StringComparison.InvariantCultureIgnoreCase)) {
 					m.Properties.Add("ChannelBindingName", ChannelBinding.TlsServerEndPoint);
 					m.Properties.Add("ChannelBindingData", tlsServerEndPointChannelBinding);
@@ -1228,6 +1244,8 @@ namespace Artalk.Xmpp.Core {
 			var m = new List<string>();
 			if (!String.IsNullOrEmpty(OAuthBearerToken))
 				m.Add("OAUTHBEARER");
+			if (!String.IsNullOrEmpty(CiscoVtgToken))
+				m.Add("CISCO-VTG-TOKEN");
 			if (Password != null) {
 				if (tlsServerEndPointChannelBinding != null &&
 					(!channelBindingFeatureAdvertised ||

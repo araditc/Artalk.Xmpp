@@ -43,12 +43,54 @@ public sealed class SaslOAuthBearerTests {
 	}
 
 	[TestMethod]
+	public void CiscoVtgTokenInitialResponseContainsUseridAndToken() {
+		var mechanism = new SaslCiscoVtgToken("user@example.com", "token-value");
+
+		string response = Encoding.UTF8.GetString(
+			mechanism.GetResponse(Array.Empty<byte>()));
+
+		Assert.AreEqual("userid=user@example.com\0token=token-value", response);
+		Assert.IsTrue(mechanism.IsCompleted);
+	}
+
+	[TestMethod]
+	public void FactoryCanCreateCiscoVtgTokenMechanism() {
+		SaslMechanism mechanism = SaslFactory.Create("CISCO-VTG-TOKEN");
+
+		Assert.AreEqual("CISCO-VTG-TOKEN", mechanism.Name);
+		Assert.IsTrue(mechanism.HasInitial);
+	}
+
+	[TestMethod]
 	public void SelectMechanismPrefersOAuthBearerWhenTokenIsSet() {
 		var core = new XmppCore("example.com") {
 			OAuthBearerToken = "token-value"
 		};
 
 		string mechanism = SelectMechanism(core, "PLAIN", "OAUTHBEARER");
+
+		Assert.AreEqual("OAUTHBEARER", mechanism);
+	}
+
+	[TestMethod]
+	public void SelectMechanismUsesCiscoVtgTokenWhenTokenIsSet() {
+		var core = new XmppCore("example.com") {
+			CiscoVtgToken = "token-value"
+		};
+
+		string mechanism = SelectMechanism(core, "PLAIN", "CISCO-VTG-TOKEN");
+
+		Assert.AreEqual("CISCO-VTG-TOKEN", mechanism);
+	}
+
+	[TestMethod]
+	public void SelectMechanismPrefersOAuthBearerOverCiscoVtgToken() {
+		var core = new XmppCore("example.com") {
+			OAuthBearerToken = "oauth-token",
+			CiscoVtgToken = "cisco-token"
+		};
+
+		string mechanism = SelectMechanism(core, "CISCO-VTG-TOKEN", "OAUTHBEARER");
 
 		Assert.AreEqual("OAUTHBEARER", mechanism);
 	}

@@ -19,7 +19,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - STARTTLS and direct TLS
 - XMPP over BOSH
 - XMPP over WebSocket
-- SASL authentication: OAUTHBEARER, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
+- SASL authentication: OAUTHBEARER, CISCO-VTG-TOKEN, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - XEP-0388 SASL2 foundation: stream-feature parsing, SASL2 authentication framing, additional-data handling, and no post-success stream restart
 - XEP-0440 SASL Channel-Binding Type Capability for SCRAM-PLUS selection
 - XEP-0474 SASL SCRAM Downgrade Protection hash verification
@@ -46,7 +46,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.18.0
+dotnet add package Artalk.Xmpp --version 2.19.0
 ```
 
 Or reference the project directly:
@@ -164,6 +164,22 @@ client.Connect("oauth-client");
 ```
 
 When `OAuthBearerToken` is set and the server advertises `OAUTHBEARER`, Artalk.Xmpp prefers it over password-based SASL mechanisms.
+
+## Cisco VTG Token Authentication
+
+For Cisco Unified CM IM and Presence or Cisco Jabber deployments that advertise SASL `CISCO-VTG-TOKEN`, set `Username` and `CiscoVtgToken` before connecting:
+
+```csharp
+using Artalk.Xmpp.Client;
+
+using var client = new ArtalkXmppClient("cisco-im.example.com");
+
+client.Username = "user@example.com";
+client.CiscoVtgToken = ciscoToken;
+client.Connect("jabber-client");
+```
+
+When `CiscoVtgToken` is set and the server advertises `CISCO-VTG-TOKEN`, Artalk.Xmpp selects it before password-based SASL mechanisms. The library sends the caller-provided token through Cisco's SASL mechanism; it does not acquire Cisco SSO or edge-authentication tokens.
 
 ## OMEMO Foundation
 
@@ -354,6 +370,8 @@ For BOSH, prefer an `https://` connection manager URL so the HTTP binding is pro
 For WebSocket, prefer `wss://` endpoint URLs. RFC 7395 uses the `xmpp` WebSocket subprotocol and sends each stanza as an independent UTF-8 text frame.
 
 OAuth bearer tokens are sent only when the server advertises `OAUTHBEARER`. Use TLS or HTTPS transport when authenticating with bearer tokens.
+
+Cisco VTG tokens are sent only when the server advertises `CISCO-VTG-TOKEN`. Use STARTTLS, direct TLS, BOSH over HTTPS, or WebSocket over WSS when authenticating with Cisco token-based mechanisms.
 
 OMEMO support covers current XEP-0384 device list and bundle publication/retrieval, trust policies, trust-store integration, encrypted message envelope parsing/serialization, payload encryption/authentication, and send/decrypt orchestration. Applications must provide a vetted `IOmemoSessionCipher` adapter and persistent OMEMO key/session store for per-device X3DH and Double Ratchet state.
 

@@ -170,6 +170,23 @@
           </code>
         </example>
       </ArtalkXmppClient>
+      <ArtalkXmppClient name="CiscoVtgToken">
+        <example>
+          This example demonstrates how to authenticate with a Cisco Jabber
+          deployment that advertises the SASL CISCO-VTG-TOKEN mechanism.
+          <code language="c#">
+            string hostname = "cisco-im.example.com",
+              username = "user@example.com",
+              ciscoToken = "CiscoVtgToken";
+
+            using (var cl = new ArtalkXmppClient(hostname)) {
+              cl.Username = username;
+              cl.CiscoVtgToken = ciscoToken;
+              cl.Connect("jabber-client");
+            }
+          </code>
+        </example>
+      </ArtalkXmppClient>
       <ArtalkXmppClient name="OmemoDeviceList">
         <example>
           This example demonstrates how to publish OMEMO device metadata and
