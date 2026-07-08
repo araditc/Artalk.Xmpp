@@ -1013,6 +1013,8 @@ namespace Artalk.Xmpp.Core {
 				string name = SelectMechanism(mechanisms, channelBindingTypes);
 				SaslMechanism m = CreateSaslMechanism(name, username, password,
 					hostname);
+				ConfigureSaslDowngradeProtection(m, name, mechanisms,
+					channelBindingTypes);
 				var xml = Xml.Element("auth", "urn:ietf:params:xml:ns:xmpp-sasl")
 					.Attr("mechanism", name)
 					.Text(m.HasInitial ? m.GetResponse(String.Empty) : String.Empty);
@@ -1049,6 +1051,8 @@ namespace Artalk.Xmpp.Core {
 				string name = SelectMechanism(feature.Mechanisms, channelBindingTypes);
 				SaslMechanism m = CreateSaslMechanism(name, username, password,
 					hostname);
+				ConfigureSaslDowngradeProtection(m, name, feature.Mechanisms,
+					channelBindingTypes);
 				IReadOnlyList<string> upgradeTasks =
 					SaslUpgradeTask.SelectSupported(feature.UpgradeTasks, password);
 				Send(CreateSasl2AuthenticateElement(m, upgradeTasks));
@@ -1112,6 +1116,16 @@ namespace Artalk.Xmpp.Core {
 					m.Properties.Add("ChannelBindingData", tlsServerEndPointChannelBinding);
 				}
 				return m;
+		}
+
+		static void ConfigureSaslDowngradeProtection(SaslMechanism mechanism,
+			string name, IEnumerable<string> advertisedMechanisms,
+			IEnumerable<string> advertisedChannelBindingTypes) {
+				string hash = SaslScramDowngradeProtection.Compute(name,
+					advertisedMechanisms, advertisedChannelBindingTypes);
+				if (hash != null)
+					mechanism.Properties[SaslScramDowngradeProtection.PropertyName] =
+						hash;
 		}
 
 		internal static XmlElement CreateSasl2AuthenticateElement(

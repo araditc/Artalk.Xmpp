@@ -135,6 +135,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			int iterationCount = Int32.Parse(nv["i"]);
 			if (!VerifyServerNonce(nonce))
 				throw new SaslException("Invalid server nonce: " + nonce);
+			VerifyDowngradeProtectionHash(nv["h"]);
 
 			string clientFirstBare = "n=" + SaslPrep(Username) + ",r=" + cnonce,
 				serverFirstMessage = Encoding.UTF8.GetString(challenge),
@@ -150,6 +151,19 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 				clientProof = Xor(clientKey, clientSignature);
 			return Encoding.UTF8.GetBytes(withoutProof + ",p=" +
 				Convert.ToBase64String(clientProof));
+		}
+
+		void VerifyDowngradeProtectionHash(string serverHash) {
+			if (String.IsNullOrEmpty(serverHash))
+				return;
+			if (!Properties.TryGetValue(SaslScramDowngradeProtection.PropertyName,
+				out object expectedValue) || expectedValue is not string expectedHash ||
+				String.IsNullOrEmpty(expectedHash)) {
+				throw new SaslException("SCRAM downgrade-protection hash was not " +
+					"available.");
+			}
+			if (!String.Equals(serverHash, expectedHash, StringComparison.Ordinal))
+				throw new SaslException("SCRAM downgrade-protection hash mismatch.");
 		}
 
 		bool VerifyServerNonce(string nonce) {

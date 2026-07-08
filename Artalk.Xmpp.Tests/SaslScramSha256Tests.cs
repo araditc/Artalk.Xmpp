@@ -35,6 +35,46 @@ public sealed class SaslScramSha256Tests {
 	}
 
 	[TestMethod]
+	public void DowngradeProtectionHashMatchesXep0474Example() {
+		string hash = SaslScramDowngradeProtection.Compute("SCRAM-SHA-1-PLUS",
+			new[] { "SCRAM-SHA-1", "SCRAM-SHA-1-PLUS" },
+			new[] { "tls-server-end-point", "tls-exporter" });
+
+		Assert.AreEqual("G6k/rBLDqgOhRRaCuuatSDFkJ08=", hash);
+	}
+
+	[TestMethod]
+	public void ScramRejectsMismatchedDowngradeProtectionHash() {
+		var mechanism = new SaslScramSha256("user", "pencil",
+			"rOprNGfwEbeRWgbNEkqO");
+		mechanism.Properties[SaslScramDowngradeProtection.PropertyName] = "bad";
+		mechanism.GetResponse(Array.Empty<byte>());
+
+		Assert.ThrowsExactly<SaslException>(() => mechanism.GetResponse(
+			Encoding.UTF8.GetBytes(
+			"r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0," +
+			"s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096," +
+			"h=" + SaslScramDowngradeProtection.Compute("SCRAM-SHA-256",
+				new[] { "SCRAM-SHA-256" }, null))));
+	}
+
+	[TestMethod]
+	public void ScramAcceptsMatchingDowngradeProtectionHash() {
+		var mechanism = new SaslScramSha256("user", "pencil",
+			"rOprNGfwEbeRWgbNEkqO");
+		string hash = SaslScramDowngradeProtection.Compute("SCRAM-SHA-256",
+			new[] { "SCRAM-SHA-256" }, null);
+		mechanism.Properties[SaslScramDowngradeProtection.PropertyName] = hash;
+		mechanism.GetResponse(Array.Empty<byte>());
+
+		byte[] final = mechanism.GetResponse(Encoding.UTF8.GetBytes(
+			"r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0," +
+			"s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096,h=" + hash));
+
+		StringAssert.Contains(Encoding.UTF8.GetString(final), ",p=");
+	}
+
+	[TestMethod]
 	public void FactoryCanCreateScramSha256Mechanism() {
 		SaslMechanism mechanism = SaslFactory.Create("SCRAM-SHA-256");
 

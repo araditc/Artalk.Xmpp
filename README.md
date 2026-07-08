@@ -22,6 +22,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - SASL authentication: OAUTHBEARER, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - XEP-0388 SASL2 foundation: stream-feature parsing, SASL2 authentication framing, additional-data handling, and no post-success stream restart
 - XEP-0440 SASL Channel-Binding Type Capability for SCRAM-PLUS selection
+- XEP-0474 SASL SCRAM Downgrade Protection hash verification
 - XEP-0480 SASL Upgrade Tasks for SCRAM salted-password hash upgrades over SASL2
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
@@ -44,7 +45,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.16.0
+dotnet add package Artalk.Xmpp --version 2.17.0
 ```
 
 Or reference the project directly:
@@ -358,6 +359,8 @@ OMEMO support covers current XEP-0384 device list and bundle publication/retriev
 OMEMO media sharing support covers XEP-0454 `aesgcm://` URL creation/parsing, AES-256-GCM encryption/decryption, appended authentication tags, strict message-body parsing, and optional JPEG thumbnails. Do not display `aesgcm://` links as browser-openable URLs; the URI fragment contains encryption key material and must stay inside the OMEMO-encrypted message flow. Only HTTPS download/upload URLs are accepted when creating media URIs.
 
 SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. Artalk.Xmpp understands XEP-0440 `sasl-channel-binding` announcements and uses SCRAM-PLUS only when `tls-server-end-point` is mutually supported, while preserving compatibility with servers that have not implemented XEP-0440 yet. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
+
+When a SCRAM server-first-message includes the XEP-0474 `h` attribute, Artalk.Xmpp verifies it against the hash of the SASL mechanism list and XEP-0440 channel-binding type list that were actually advertised for the active SASL profile. A mismatch fails authentication before the client proof is sent, protecting SCRAM and SCRAM-PLUS negotiation from active downgrade tampering.
 
 When an encrypted stream advertises XEP-0388 SASL2, Artalk.Xmpp uses the SASL2 `<authentication/>` profile, sends initial responses inside `<initial-response/>`, verifies SCRAM server signatures from `<additional-data/>`, and waits for the authenticated `<stream:features/>` without restarting the stream.
 
