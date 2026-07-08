@@ -24,6 +24,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - XEP-0440 SASL Channel-Binding Type Capability for SCRAM-PLUS selection
 - XEP-0474 SASL SCRAM Downgrade Protection hash verification
 - XEP-0480 SASL Upgrade Tasks for SCRAM salted-password hash upgrades over SASL2
+- XEP-0515 TLS Channel-Binding Downgrade Protection for SCRAM over TCP TLS
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
 - Multi-user chat basics: join, leave, groupchat messages, and occupant presence
@@ -45,7 +46,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.17.0
+dotnet add package Artalk.Xmpp --version 2.18.0
 ```
 
 Or reference the project directly:
@@ -361,6 +362,8 @@ OMEMO media sharing support covers XEP-0454 `aesgcm://` URL creation/parsing, AE
 SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. Artalk.Xmpp understands XEP-0440 `sasl-channel-binding` announcements and uses SCRAM-PLUS only when `tls-server-end-point` is mutually supported, while preserving compatibility with servers that have not implemented XEP-0440 yet. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
 
 When a SCRAM server-first-message includes the XEP-0474 `h` attribute, Artalk.Xmpp verifies it against the hash of the SASL mechanism list and XEP-0440 channel-binding type list that were actually advertised for the active SASL profile. A mismatch fails authentication before the client proof is sent, protecting SCRAM and SCRAM-PLUS negotiation from active downgrade tampering.
+
+When a SCRAM server-first-message includes the XEP-0515 `t` attribute on a TCP TLS stream, Artalk.Xmpp compares it with the negotiated `SslStream` TLS version encoded as four lowercase hexadecimal characters such as `0303` for TLS 1.2 and `0304` for TLS 1.3. A mismatch fails authentication before the client proof is sent. BOSH and WebSocket transports do not expose the negotiated TLS version through the current .NET transport APIs, so XEP-0515 verification is only available for TCP TLS and STARTTLS streams.
 
 When an encrypted stream advertises XEP-0388 SASL2, Artalk.Xmpp uses the SASL2 `<authentication/>` profile, sends initial responses inside `<initial-response/>`, verifies SCRAM server signatures from `<additional-data/>`, and waits for the authenticated `<stream:features/>` without restarting the stream.
 

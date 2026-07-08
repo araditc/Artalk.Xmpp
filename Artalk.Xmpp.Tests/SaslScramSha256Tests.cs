@@ -2,6 +2,7 @@ using Artalk.Xmpp.Core.Sasl;
 using Artalk.Xmpp.Core.Sasl.Mechanisms;
 using Artalk.Xmpp.Core;
 using System.Reflection;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -70,6 +71,41 @@ public sealed class SaslScramSha256Tests {
 		byte[] final = mechanism.GetResponse(Encoding.UTF8.GetBytes(
 			"r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0," +
 			"s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096,h=" + hash));
+
+		StringAssert.Contains(Encoding.UTF8.GetString(final), ",p=");
+	}
+
+	[TestMethod]
+	public void TlsDowngradeProtectionEncodesTlsVersions() {
+		Assert.AreEqual("0303",
+			SaslTlsDowngradeProtection.Encode(SslProtocols.Tls12));
+		Assert.AreEqual("0304",
+			SaslTlsDowngradeProtection.Encode(SslProtocols.Tls13));
+	}
+
+	[TestMethod]
+	public void ScramRejectsMismatchedTlsDowngradeProtectionValue() {
+		var mechanism = new SaslScramSha256("user", "pencil",
+			"rOprNGfwEbeRWgbNEkqO");
+		mechanism.Properties[SaslTlsDowngradeProtection.PropertyName] = "0304";
+		mechanism.GetResponse(Array.Empty<byte>());
+
+		Assert.ThrowsExactly<SaslException>(() => mechanism.GetResponse(
+			Encoding.UTF8.GetBytes(
+			"r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0," +
+			"s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096,t=0303")));
+	}
+
+	[TestMethod]
+	public void ScramAcceptsMatchingTlsDowngradeProtectionValue() {
+		var mechanism = new SaslScramSha256("user", "pencil",
+			"rOprNGfwEbeRWgbNEkqO");
+		mechanism.Properties[SaslTlsDowngradeProtection.PropertyName] = "0304";
+		mechanism.GetResponse(Array.Empty<byte>());
+
+		byte[] final = mechanism.GetResponse(Encoding.UTF8.GetBytes(
+			"r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0," +
+			"s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096,t=0304"));
 
 		StringAssert.Contains(Encoding.UTF8.GetString(final), ",p=");
 	}

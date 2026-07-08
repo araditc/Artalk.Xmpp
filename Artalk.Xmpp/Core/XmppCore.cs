@@ -34,6 +34,7 @@ namespace Artalk.Xmpp.Core {
 		bool boshStreamOpened;
 		bool webSocketStreamOpened;
 		byte[] tlsServerEndPointChannelBinding;
+		string tlsVersionDowngradeProtection;
 		/// <summary>
 		/// The parser instance used for parsing incoming XMPP XML-stream data.
 		/// </summary>
@@ -450,16 +451,19 @@ namespace Artalk.Xmpp.Core {
 					boshStreamOpened = false;
 					IsEncrypted = bosh.IsEncrypted;
 					tlsServerEndPointChannelBinding = null;
+					tlsVersionDowngradeProtection = null;
 				} else if (WebSocketUrl != null) {
 					webSocket = new WebSocketTransport(WebSocketUrl, Hostname);
 					webSocketStreamOpened = false;
 					IsEncrypted = webSocket.IsEncrypted;
 					tlsServerEndPointChannelBinding = null;
+					tlsVersionDowngradeProtection = null;
 				} else {
 					client = new TcpClient(Hostname, Port);
 					stream = client.GetStream();
 					IsEncrypted = false;
 					tlsServerEndPointChannelBinding = null;
+					tlsVersionDowngradeProtection = null;
 				}
 				SessionSupported = false;
 				if (DirectTls && bosh == null && webSocket == null)
@@ -984,6 +988,8 @@ namespace Artalk.Xmpp.Core {
 			IsEncrypted = true;
 			tlsServerEndPointChannelBinding = sslStream.RemoteCertificate == null ?
 				null : ChannelBinding.CreateTlsServerEndPoint(sslStream.RemoteCertificate);
+			tlsVersionDowngradeProtection =
+				SaslTlsDowngradeProtection.Encode(sslStream.SslProtocol);
 		}
 
 		/// <summary>
@@ -1114,6 +1120,10 @@ namespace Artalk.Xmpp.Core {
 				if (name.EndsWith("-PLUS", StringComparison.InvariantCultureIgnoreCase)) {
 					m.Properties.Add("ChannelBindingName", ChannelBinding.TlsServerEndPoint);
 					m.Properties.Add("ChannelBindingData", tlsServerEndPointChannelBinding);
+				}
+				if (tlsVersionDowngradeProtection != null) {
+					m.Properties[SaslTlsDowngradeProtection.PropertyName] =
+						tlsVersionDowngradeProtection;
 				}
 				return m;
 		}

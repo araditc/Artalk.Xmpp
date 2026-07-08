@@ -136,6 +136,7 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			if (!VerifyServerNonce(nonce))
 				throw new SaslException("Invalid server nonce: " + nonce);
 			VerifyDowngradeProtectionHash(nv["h"]);
+			VerifyTlsDowngradeProtection(nv["t"]);
 
 			string clientFirstBare = "n=" + SaslPrep(Username) + ",r=" + cnonce,
 				serverFirstMessage = Encoding.UTF8.GetString(challenge),
@@ -164,6 +165,21 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			}
 			if (!String.Equals(serverHash, expectedHash, StringComparison.Ordinal))
 				throw new SaslException("SCRAM downgrade-protection hash mismatch.");
+		}
+
+		void VerifyTlsDowngradeProtection(string serverTlsVersion) {
+			if (String.IsNullOrEmpty(serverTlsVersion))
+				return;
+			if (!Properties.TryGetValue(SaslTlsDowngradeProtection.PropertyName,
+				out object expectedValue) || expectedValue is not string expectedVersion ||
+				String.IsNullOrEmpty(expectedVersion)) {
+				throw new SaslException("SCRAM TLS downgrade-protection value was " +
+					"not available.");
+			}
+			if (!String.Equals(serverTlsVersion, expectedVersion,
+				StringComparison.Ordinal)) {
+				throw new SaslException("SCRAM TLS downgrade-protection mismatch.");
+			}
 		}
 
 		bool VerifyServerNonce(string nonce) {
