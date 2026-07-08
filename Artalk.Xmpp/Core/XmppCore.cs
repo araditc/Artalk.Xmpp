@@ -1049,7 +1049,9 @@ namespace Artalk.Xmpp.Core {
 				string name = SelectMechanism(feature.Mechanisms, channelBindingTypes);
 				SaslMechanism m = CreateSaslMechanism(name, username, password,
 					hostname);
-				Send(CreateSasl2AuthenticateElement(m));
+				IReadOnlyList<string> upgradeTasks =
+					SaslUpgradeTask.SelectSupported(feature.UpgradeTasks, password);
+				Send(CreateSasl2AuthenticateElement(m, upgradeTasks));
 				while (true) {
 					XmlElement ret = Receive("challenge", "success", "failure",
 						"continue");
@@ -1061,8 +1063,8 @@ namespace Artalk.Xmpp.Core {
 						string additionalData = GetSasl2AdditionalData(ret);
 						if (additionalData != null)
 							CompleteServerSignature(m, additionalData);
-						throw new SaslException("SASL2 continuation tasks are not " +
-							"supported yet.");
+						CompleteSasl2UpgradeTask(ret, upgradeTasks, password);
+						continue;
 					}
 					if (ret.LocalName == "success") {
 						string additionalData = GetSasl2AdditionalData(ret);
@@ -1077,6 +1079,22 @@ namespace Artalk.Xmpp.Core {
 					Send(Xml.Element("response", Sasl2Feature.Namespace).Text(
 						m.GetResponse(ret.InnerText)));
 				}
+		}
+
+		void CompleteSasl2UpgradeTask(XmlElement continueElement,
+			IEnumerable<string> requestedUpgradeTasks, string password) {
+				string task = GetSasl2Task(continueElement);
+				var requested = new HashSet<string>(requestedUpgradeTasks,
+					StringComparer.InvariantCultureIgnoreCase);
+				if (!requested.Contains(task) || !SaslUpgradeTask.Supports(task))
+					throw new SaslException("Unsupported SASL2 continuation task.");
+				Send(SaslUpgradeTask.CreateNextElement(task));
+				XmlElement ret = Receive("task-data", "failure");
+				if (ret.NamespaceURI != Sasl2Feature.Namespace)
+					throw new SaslException("Unexpected SASL2 task response namespace.");
+				if (ret.LocalName == "failure")
+					throw new SaslException("SASL2 upgrade task failed.");
+				Send(SaslUpgradeTask.CreateHashTaskData(task, password, ret));
 		}
 
 		SaslMechanism CreateSaslMechanism(string name, string username,
@@ -1097,10 +1115,14 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		internal static XmlElement CreateSasl2AuthenticateElement(
-			SaslMechanism mechanism) {
+			SaslMechanism mechanism, IEnumerable<string> upgradeTasks = null) {
 				mechanism.ThrowIfNull("mechanism");
 				var xml = Xml.Element("authenticate", Sasl2Feature.Namespace)
 					.Attr("mechanism", mechanism.Name);
+				if (upgradeTasks != null) {
+					foreach (string task in upgradeTasks)
+						xml.Child(SaslUpgradeTask.CreateUpgradeElement(task));
+				}
 				if (mechanism.HasInitial) {
 					xml.Child(Xml.Element("initial-response", Sasl2Feature.Namespace)
 						.Text(mechanism.GetResponse(String.Empty)));
@@ -1124,6 +1146,30 @@ namespace Artalk.Xmpp.Core {
 				}
 			}
 			return null;
+		}
+
+		static string GetSasl2Task(XmlElement continueElement) {
+			var tasks = new List<string>();
+			foreach (XmlNode node in continueElement.ChildNodes) {
+				if (node is not XmlElement tasksElement ||
+					tasksElement.LocalName != "tasks" ||
+					tasksElement.NamespaceURI != Sasl2Feature.Namespace) {
+					continue;
+				}
+				foreach (XmlNode taskNode in tasksElement.ChildNodes) {
+					if (taskNode is XmlElement taskElement &&
+						taskElement.LocalName == "task" &&
+						taskElement.NamespaceURI == Sasl2Feature.Namespace) {
+						string task = taskElement.InnerText.Trim();
+						if (!String.IsNullOrEmpty(task))
+							tasks.Add(task);
+					}
+				}
+			}
+			if (tasks.Count != 1)
+				throw new SaslException("SASL2 upgrade continuation must contain " +
+					"exactly one task.");
+			return tasks[0];
 		}
 
 		/// <summary>

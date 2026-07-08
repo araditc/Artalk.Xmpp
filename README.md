@@ -22,6 +22,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - SASL authentication: OAUTHBEARER, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - XEP-0388 SASL2 foundation: stream-feature parsing, SASL2 authentication framing, additional-data handling, and no post-success stream restart
 - XEP-0440 SASL Channel-Binding Type Capability for SCRAM-PLUS selection
+- XEP-0480 SASL Upgrade Tasks for SCRAM salted-password hash upgrades over SASL2
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
 - Multi-user chat basics: join, leave, groupchat messages, and occupant presence
@@ -43,7 +44,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.15.0
+dotnet add package Artalk.Xmpp --version 2.16.0
 ```
 
 Or reference the project directly:
@@ -358,7 +359,9 @@ OMEMO media sharing support covers XEP-0454 `aesgcm://` URL creation/parsing, AE
 
 SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. Artalk.Xmpp understands XEP-0440 `sasl-channel-binding` announcements and uses SCRAM-PLUS only when `tls-server-end-point` is mutually supported, while preserving compatibility with servers that have not implemented XEP-0440 yet. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
 
-When an encrypted stream advertises XEP-0388 SASL2, Artalk.Xmpp uses the SASL2 `<authentication/>` profile, sends initial responses inside `<initial-response/>`, verifies SCRAM server signatures from `<additional-data/>`, and waits for the authenticated `<stream:features/>` without restarting the stream. SASL2 continuation tasks such as second-factor or password-change flows are detected and rejected with a clear authentication error until those task XEPs are implemented.
+When an encrypted stream advertises XEP-0388 SASL2, Artalk.Xmpp uses the SASL2 `<authentication/>` profile, sends initial responses inside `<initial-response/>`, verifies SCRAM server signatures from `<additional-data/>`, and waits for the authenticated `<stream:features/>` without restarting the stream.
+
+If the SASL2 feature advertises XEP-0480 SCRAM upgrade tasks and password authentication is available, Artalk.Xmpp requests supported `UPGR-SCRAM-*` tasks, handles the SASL2 `<continue/>` flow, derives the requested salted password from the server-provided salt and iteration count, and returns it inside `<task-data><hash/></task-data>`. Upgrade tasks that are not SCRAM hash upgrades remain unsupported and fail with a clear authentication error.
 
 When a server advertises legacy XMPP session establishment, Artalk.Xmpp completes it. Modern servers that omit the legacy session feature are no longer rejected during sign-in.
 

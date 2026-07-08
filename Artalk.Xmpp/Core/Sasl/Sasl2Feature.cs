@@ -8,6 +8,7 @@ namespace Artalk.Xmpp.Core.Sasl {
 
 		readonly List<string> mechanisms;
 		readonly List<XmlElement> inlineFeatures;
+		readonly List<string> upgradeTasks;
 
 		public IReadOnlyList<string> Mechanisms {
 			get {
@@ -21,9 +22,17 @@ namespace Artalk.Xmpp.Core.Sasl {
 			}
 		}
 
-		Sasl2Feature(List<string> mechanisms, List<XmlElement> inlineFeatures) {
+		public IReadOnlyList<string> UpgradeTasks {
+			get {
+				return upgradeTasks;
+			}
+		}
+
+		Sasl2Feature(List<string> mechanisms, List<XmlElement> inlineFeatures,
+			List<string> upgradeTasks) {
 			this.mechanisms = mechanisms;
 			this.inlineFeatures = inlineFeatures;
+			this.upgradeTasks = upgradeTasks;
 		}
 
 		public static Sasl2Feature Parse(XmlElement features) {
@@ -41,6 +50,7 @@ namespace Artalk.Xmpp.Core.Sasl {
 		static Sasl2Feature ParseAuthentication(XmlElement authentication) {
 			var mechanisms = new List<string>();
 			var inlineFeatures = new List<XmlElement>();
+			var upgradeTasks = new List<string>();
 			foreach (XmlNode node in authentication.ChildNodes) {
 				if (node is not XmlElement element)
 					continue;
@@ -58,9 +68,15 @@ namespace Artalk.Xmpp.Core.Sasl {
 							inlineFeatures.Add((XmlElement) inlineElement.CloneNode(true));
 					}
 				}
+				if (element.LocalName == "upgrade" &&
+					element.NamespaceURI == SaslUpgradeTask.Namespace) {
+					string task = element.InnerText.Trim();
+					if (!String.IsNullOrEmpty(task))
+						upgradeTasks.Add(task);
+				}
 			}
 			return mechanisms.Count == 0 ? null :
-				new Sasl2Feature(mechanisms, inlineFeatures);
+				new Sasl2Feature(mechanisms, inlineFeatures, upgradeTasks);
 		}
 	}
 }

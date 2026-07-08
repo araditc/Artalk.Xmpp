@@ -142,7 +142,8 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 				nonce;
 			authMessage = clientFirstBare + "," + serverFirstMessage + "," +
 				withoutProof;
-			saltedPassword = Hi(Password, salt, iterationCount);
+			saltedPassword = ComputeSaltedPassword(Password, salt, iterationCount,
+				hashLength, ComputeHmac);
 			byte[] clientKey = ComputeHmac(saltedPassword, "Client Key"),
 				storedKey = ComputeHash(clientKey),
 				clientSignature = ComputeHmac(storedKey, authMessage),
@@ -182,17 +183,21 @@ namespace Artalk.Xmpp.Core.Sasl.Mechanisms {
 			return coll;
 		}
 
-		byte[] Hi(string password, string salt, int count) {
+		internal static byte[] ComputeSaltedPassword(string password, string salt,
+			int count, int hashLength, Func<byte[], byte[], byte[]> hmac) {
+			password.ThrowIfNull("password");
+			salt.ThrowIfNull("salt");
+			hmac.ThrowIfNull("hmac");
 			byte[] saltBytes = Convert.FromBase64String(salt);
 			byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 			byte[] block = new byte[saltBytes.Length + 4];
 			Buffer.BlockCopy(saltBytes, 0, block, 0, saltBytes.Length);
 			block[block.Length - 1] = 1;
 
-			byte[] u = ComputeHmac(passwordBytes, block);
+			byte[] u = hmac(passwordBytes, block);
 			byte[] output = (byte[]) u.Clone();
 			for (int i = 1; i < count; i++) {
-				u = ComputeHmac(passwordBytes, u);
+				u = hmac(passwordBytes, u);
 				for (int j = 0; j < output.Length; j++)
 					output[j] = (byte) (output[j] ^ u[j]);
 			}
