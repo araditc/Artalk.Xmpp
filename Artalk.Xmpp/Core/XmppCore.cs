@@ -880,21 +880,21 @@ namespace Artalk.Xmpp.Core {
 			// If no Username has been provided, don't perform authentication.
 			if (Username == null)
 				return;
-			// Construct a list of SASL mechanisms supported by the server.
-			var m = feats["mechanisms"];
-			if (m == null || !m.HasChildNodes)
-				throw new AuthenticationException("No SASL mechanisms advertised.");
-			var mech = m.FirstChild;
-			var list = new HashSet<string>();
-			while (mech != null) {
-					list.Add(mech.InnerText);
-				mech = mech.NextSibling;
-			}
+			Sasl2Feature sasl2Feature = Sasl2Feature.Parse(feats);
 			HashSet<string> channelBindingTypes = GetChannelBindingTypes(feats);
 			// Continue with SASL authentication.
 			try {
-				feats = Authenticate(list, channelBindingTypes, Username, Password,
-					Hostname);
+				if (sasl2Feature != null && IsEncrypted) {
+					feats = Authenticate(sasl2Feature, channelBindingTypes, Username,
+						Password, Hostname);
+				} else {
+					// Construct a list of legacy SASL mechanisms supported by the server.
+					var list = GetSaslMechanisms(feats);
+					if (list.Count == 0)
+						throw new AuthenticationException("No SASL mechanisms advertised.");
+					feats = Authenticate(list, channelBindingTypes, Username, Password,
+						Hostname);
+				}
 				SessionSupported = feats["session"] != null;
 				// FIXME: How is the client's JID constructed if the server does not support
 				// resource binding?
@@ -1011,18 +1011,8 @@ namespace Artalk.Xmpp.Core {
 			IEnumerable<string> channelBindingTypes, string username, string password,
 			string hostname) {
 				string name = SelectMechanism(mechanisms, channelBindingTypes);
-				SaslMechanism m = SaslFactory.Create(name);
-				m.Properties.Add("Username", username);
-				m.Properties.Add("Password", password);
-				if (!String.IsNullOrEmpty(OAuthBearerToken)) {
-					m.Properties.Add("OAuthBearerToken", OAuthBearerToken);
-					m.Properties.Add("Hostname", hostname);
-					m.Properties.Add("Port", Port);
-				}
-				if (name.EndsWith("-PLUS", StringComparison.InvariantCultureIgnoreCase)) {
-					m.Properties.Add("ChannelBindingName", ChannelBinding.TlsServerEndPoint);
-					m.Properties.Add("ChannelBindingData", tlsServerEndPointChannelBinding);
-				}
+				SaslMechanism m = CreateSaslMechanism(name, username, password,
+					hostname);
 				var xml = Xml.Element("auth", "urn:ietf:params:xml:ns:xmpp-sasl")
 					.Attr("mechanism", name)
 					.Text(m.HasInitial ? m.GetResponse(String.Empty) : String.Empty);
@@ -1051,6 +1041,89 @@ namespace Artalk.Xmpp.Core {
 				Authenticated = true;
 				// Finally, initiate a new XML-stream.
 				return InitiateStream(hostname);
+		}
+
+		XmlElement Authenticate(Sasl2Feature feature,
+			IEnumerable<string> channelBindingTypes, string username, string password,
+			string hostname) {
+				string name = SelectMechanism(feature.Mechanisms, channelBindingTypes);
+				SaslMechanism m = CreateSaslMechanism(name, username, password,
+					hostname);
+				Send(CreateSasl2AuthenticateElement(m));
+				while (true) {
+					XmlElement ret = Receive("challenge", "success", "failure",
+						"continue");
+					if (ret.NamespaceURI != Sasl2Feature.Namespace)
+						throw new SaslException("Unexpected SASL2 response namespace.");
+					if (ret.LocalName == "failure")
+						throw new SaslException("SASL2 authentication failed.");
+					if (ret.LocalName == "continue") {
+						string additionalData = GetSasl2AdditionalData(ret);
+						if (additionalData != null)
+							CompleteServerSignature(m, additionalData);
+						throw new SaslException("SASL2 continuation tasks are not " +
+							"supported yet.");
+					}
+					if (ret.LocalName == "success") {
+						string additionalData = GetSasl2AdditionalData(ret);
+						if (additionalData != null)
+							CompleteServerSignature(m, additionalData);
+						else if (!m.IsCompleted)
+							throw new SaslException("SASL2 authentication success did " +
+								"not include mechanism completion data.");
+						Authenticated = true;
+						return Receive("stream:features");
+					}
+					Send(Xml.Element("response", Sasl2Feature.Namespace).Text(
+						m.GetResponse(ret.InnerText)));
+				}
+		}
+
+		SaslMechanism CreateSaslMechanism(string name, string username,
+			string password, string hostname) {
+				SaslMechanism m = SaslFactory.Create(name);
+				m.Properties.Add("Username", username);
+				m.Properties.Add("Password", password);
+				if (!String.IsNullOrEmpty(OAuthBearerToken)) {
+					m.Properties.Add("OAuthBearerToken", OAuthBearerToken);
+					m.Properties.Add("Hostname", hostname);
+					m.Properties.Add("Port", Port);
+				}
+				if (name.EndsWith("-PLUS", StringComparison.InvariantCultureIgnoreCase)) {
+					m.Properties.Add("ChannelBindingName", ChannelBinding.TlsServerEndPoint);
+					m.Properties.Add("ChannelBindingData", tlsServerEndPointChannelBinding);
+				}
+				return m;
+		}
+
+		internal static XmlElement CreateSasl2AuthenticateElement(
+			SaslMechanism mechanism) {
+				mechanism.ThrowIfNull("mechanism");
+				var xml = Xml.Element("authenticate", Sasl2Feature.Namespace)
+					.Attr("mechanism", mechanism.Name);
+				if (mechanism.HasInitial) {
+					xml.Child(Xml.Element("initial-response", Sasl2Feature.Namespace)
+						.Text(mechanism.GetResponse(String.Empty)));
+				}
+				return xml;
+		}
+
+		static void CompleteServerSignature(SaslMechanism mechanism,
+			string additionalData) {
+				string response = mechanism.GetResponse(additionalData);
+				if (response != String.Empty)
+					throw new SaslException("Could not verify server's signature.");
+		}
+
+		static string GetSasl2AdditionalData(XmlElement element) {
+			foreach (XmlNode node in element.ChildNodes) {
+				if (node is XmlElement child &&
+					child.LocalName == "additional-data" &&
+					child.NamespaceURI == Sasl2Feature.Namespace) {
+					return child.InnerText;
+				}
+			}
+			return null;
 		}
 
 		/// <summary>
@@ -1137,6 +1210,29 @@ namespace Artalk.Xmpp.Core {
 				return types;
 			}
 			return null;
+		}
+
+		static HashSet<string> GetSaslMechanisms(XmlElement features) {
+			features.ThrowIfNull("features");
+			var mechanisms = new HashSet<string>(
+				StringComparer.InvariantCultureIgnoreCase);
+			foreach (XmlNode node in features.ChildNodes) {
+				if (node is not XmlElement element ||
+					element.LocalName != "mechanisms" ||
+					element.NamespaceURI != "urn:ietf:params:xml:ns:xmpp-sasl") {
+					continue;
+				}
+				foreach (XmlNode childNode in element.ChildNodes) {
+					if (childNode is XmlElement child &&
+						child.LocalName == "mechanism" &&
+						child.NamespaceURI == "urn:ietf:params:xml:ns:xmpp-sasl" &&
+						!String.IsNullOrWhiteSpace(child.InnerText)) {
+						mechanisms.Add(child.InnerText.Trim());
+					}
+				}
+				break;
+			}
+			return mechanisms;
 		}
 
 		/// <summary>

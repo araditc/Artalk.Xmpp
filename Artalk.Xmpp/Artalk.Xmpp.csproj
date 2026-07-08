@@ -12,14 +12,14 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <PackageTags>xmpp;jabber;net10;sasl;scram;omemo;bosh;websocket;xep-0440;xep-0454</PackageTags>
-    <Version>2.14.0</Version>
-    <AssemblyVersion>2.14.0</AssemblyVersion>
+    <PackageTags>xmpp;jabber;net10;sasl;sasl2;scram;omemo;bosh;websocket;xep-0388;xep-0440;xep-0454</PackageTags>
+    <Version>2.15.0</Version>
+    <AssemblyVersion>2.15.0</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Add XEP-0440 SASL Channel-Binding Type Capability handling for SCRAM-PLUS mechanism selection.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add XEP-0388 SASL2 foundation with stream-feature parsing and SASL2 authentication framing.</PackageReleaseNotes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <Deterministic>true</Deterministic>
