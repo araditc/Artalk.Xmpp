@@ -14,40 +14,42 @@ The core library targets `net10.0` and does not require Windows-only packages.
 
 ## Supported XMPP Features
 
-- TCP XML streams
+- RFC 6120 TCP XML streams
 - RFC 7622-oriented JID parsing, IDN domain normalization, and PRECIS-profile checks
-- STARTTLS and direct TLS
-- XMPP over BOSH
-- XMPP over WebSocket
-- SASL authentication: OAUTHBEARER, CISCO-VTG-TOKEN, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
+- RFC 7590 TLS recommendations with RFC 6120 STARTTLS and direct TLS support
+- XEP-0124 / XEP-0206 XMPP over BOSH
+- RFC 7395 XMPP over WebSocket
+- RFC 6120 SASL authentication: OAUTHBEARER, CISCO-VTG-TOKEN, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - XEP-0388 SASL2 foundation: stream-feature parsing, SASL2 authentication framing, additional-data handling, and no post-success stream restart
 - XEP-0440 SASL Channel-Binding Type Capability for SCRAM-PLUS selection
 - XEP-0474 SASL SCRAM Downgrade Protection hash verification
 - XEP-0480 SASL Upgrade Tasks for SCRAM salted-password hash upgrades over SASL2
 - XEP-0515 TLS Channel-Binding Downgrade Protection for SCRAM over TCP TLS
 - XEP-0453 DOAP project metadata: [`doap.xml`](doap.xml)
-- Optional legacy XMPP session establishment
-- Instant messaging and presence
-- Multi-user chat basics: join, leave, groupchat messages, and occupant presence
-- Roster management
-- Service discovery
-- Entity capabilities
-- XMPP ping
-- Chat state notifications
+- RFC 6120 optional legacy XMPP session establishment
+- RFC 6121 instant messaging and presence
+- RFC 6121 roster management
+- XEP-0045 Multi-User Chat basics: join, leave, groupchat messages, and occupant presence
+- XEP-0030 Service Discovery
+- XEP-0115 Entity Capabilities
+- XEP-0199 XMPP Ping
+- XEP-0085 Chat State Notifications
 - OMEMO foundation: XEP-0384 device list, bundle, trust/session orchestration, encrypted envelope, and payload crypto helpers
 - OMEMO media sharing: XEP-0454 `aesgcm://` URIs, AES-256-GCM media encryption, strict body parsing, and JPEG thumbnails
-- User avatar, mood, tune, and activity
-- In-band registration
-- Private XML storage
-- SOCKS5 and in-band file transfer
-- Simplified blocking
+- XEP-0084 User Avatar, XEP-0107 User Mood, XEP-0118 User Tune, and XEP-0108 User Activity
+- XEP-0077 In-Band Registration
+- XEP-0049 Private XML Storage
+- XEP-0004 Data Forms and XEP-0020 Feature Negotiation for legacy XEP-0095 / XEP-0096 file-transfer flows
+- XEP-0065 SOCKS5 Bytestreams and XEP-0047 In-Band Bytestreams
+- XEP-0092 Software Version, XEP-0202 Entity Time, XEP-0224 Attention, XEP-0231 Bits of Binary, and XEP-0279 Server IP Check
+- XEP-0191 Blocking Command
 
 ## Install
 
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.19.3
+dotnet add package Artalk.Xmpp --version 2.19.4
 ```
 
 Or reference the project directly:
@@ -414,6 +416,7 @@ Artalk.Xmpp publishes XEP-0453-compatible DOAP metadata in [`doap.xml`](doap.xml
 | [RFC 6120](https://datatracker.ietf.org/doc/html/rfc6120) | XMPP Core | partial |
 | [RFC 6121](https://datatracker.ietf.org/doc/html/rfc6121) | Instant Messaging and Presence | partial |
 | [RFC 7395](https://datatracker.ietf.org/doc/html/rfc7395) | XMPP over WebSocket | complete |
+| [RFC 7590](https://datatracker.ietf.org/doc/html/rfc7590) | TLS in XMPP | partial |
 | [RFC 7622](https://datatracker.ietf.org/doc/html/rfc7622) | XMPP Address Format | partial |
 
 ### XEP Support
@@ -423,9 +426,11 @@ The DOAP metadata includes the current XEP document version, the first Artalk.Xm
 | XEP | Spec Version | Since | Status | Notes |
 | --- | --- | --- | --- | --- |
 | [XEP-0004](https://xmpp.org/extensions/xep-0004.html) | 2.13.2 | 2.0.0 | partial | Data Forms are used by the registration and feature-negotiation helpers. |
+| [XEP-0020](https://xmpp.org/extensions/xep-0020.html) | 1.6 | 2.0.0 | partial | Deprecated feature-negotiation helpers remain for legacy stream-initiation and file-transfer flows. |
 | [XEP-0030](https://xmpp.org/extensions/xep-0030.html) | 2.5.0 | 2.0.0 | partial | Service discovery query helpers are available. |
 | [XEP-0045](https://xmpp.org/extensions/xep-0045.html) | 1.35.5 | 2.2.0 | partial | Basic room join, leave, groupchat message, and occupant presence support. |
 | [XEP-0047](https://xmpp.org/extensions/xep-0047.html) | 2.0.1 | 2.0.0 | partial | In-band bytestream support is available for file-transfer flows. |
+| [XEP-0049](https://xmpp.org/extensions/xep-0049.html) | 1.2 | 2.0.0 | complete | Private XML storage get/set helpers are available. |
 | [XEP-0065](https://xmpp.org/extensions/xep-0065.html) | 1.8.2 | 2.0.0 | partial | SOCKS5 bytestream and STUN-assisted address discovery helpers are available. |
 | [XEP-0077](https://xmpp.org/extensions/xep-0077.html) | 2.4 | 2.0.0 | partial | In-band registration form flow is supported. |
 | [XEP-0084](https://xmpp.org/extensions/xep-0084.html) | 1.1.4 | 2.0.0 | partial | User avatar publication and change events expose raw avatar data and MIME type. |

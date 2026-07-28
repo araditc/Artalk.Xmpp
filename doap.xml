@@ -26,6 +26,7 @@
     <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc6120"/>
     <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc6121"/>
     <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc7395"/>
+    <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc7590"/>
     <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc7622"/>
 
     <implements>
@@ -35,6 +36,15 @@
         <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
         <xmpp:note>Data Forms are used by the registration and feature-negotiation helpers.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0020.html"/>
+        <xmpp:version>1.6</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note>Deprecated feature-negotiation helpers remain for legacy stream-initiation and file-transfer flows.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -62,6 +72,15 @@
         <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
         <xmpp:note>In-band bytestream support is available for file-transfer flows.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0049.html"/>
+        <xmpp:version>1.2</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
+        <xmpp:status>complete</xmpp:status>
+        <xmpp:note>Private XML storage get/set helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -319,9 +338,9 @@
 
     <release>
       <Version>
-        <revision>2.19.3</revision>
+        <revision>2.19.4</revision>
         <created>2026-07-28</created>
-        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.3"/>
+        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.4"/>
       </Version>
     </release>
   </Project>
