@@ -23,224 +23,305 @@
       </GitRepository>
     </repository>
 
-    <implements rdf:resource="https://xmpp.org/rfcs/rfc6120.html"/>
-    <implements rdf:resource="https://xmpp.org/rfcs/rfc6121.html"/>
-    <implements rdf:resource="https://xmpp.org/rfcs/rfc7395.html"/>
-    <implements rdf:resource="https://xmpp.org/rfcs/rfc7622.html"/>
+    <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc6120"/>
+    <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc6121"/>
+    <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc7395"/>
+    <implements rdf:resource="https://datatracker.ietf.org/doc/html/rfc7622"/>
 
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0004.html"/>
+        <xmpp:version>2.13.2</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">Data Forms are used by the registration and feature-negotiation helpers.</xmpp:note>
+        <xmpp:note>Data Forms are used by the registration and feature-negotiation helpers.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0030.html"/>
+        <xmpp:version>2.5.0</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">Service discovery query helpers are available.</xmpp:note>
+        <xmpp:note>Service discovery query helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0045.html"/>
+        <xmpp:version>1.35.5</xmpp:version>
+        <xmpp:since>2.2.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">Basic room join, leave, groupchat message, and occupant presence support.</xmpp:note>
+        <xmpp:note>Basic room join, leave, groupchat message, and occupant presence support.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0047.html"/>
+        <xmpp:version>2.0.1</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">In-band bytestream support is available for file-transfer flows.</xmpp:note>
+        <xmpp:note>In-band bytestream support is available for file-transfer flows.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0065.html"/>
+        <xmpp:version>1.8.2</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">SOCKS5 bytestream and STUN-assisted address discovery helpers are available.</xmpp:note>
+        <xmpp:note>SOCKS5 bytestream and STUN-assisted address discovery helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0077.html"/>
+        <xmpp:version>2.4</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">In-band registration form flow is supported.</xmpp:note>
+        <xmpp:note>In-band registration form flow is supported.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0084.html"/>
+        <xmpp:version>1.1.4</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">User avatar publication and change events expose raw avatar data and MIME type.</xmpp:note>
+        <xmpp:note>User avatar publication and change events expose raw avatar data and MIME type.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0085.html"/>
+        <xmpp:version>2.1</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>Chat state notification helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0092.html"/>
+        <xmpp:version>1.1</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>Software version replies are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0095.html"/>
+        <xmpp:version>1.2</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
+        <xmpp:note>Deprecated stream initiation support remains for legacy file-transfer flows.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0096.html"/>
+        <xmpp:version>1.3.1</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
+        <xmpp:note>Deprecated SI file-transfer support remains for legacy interoperability.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0107.html"/>
+        <xmpp:version>1.2.2</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
+        <xmpp:note>User mood publication/parsing helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0108.html"/>
+        <xmpp:version>1.3</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
+        <xmpp:note>User activity publication/parsing helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0115.html"/>
+        <xmpp:version>1.6.0</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
+        <xmpp:note>Entity capabilities helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0118.html"/>
+        <xmpp:version>1.3.0</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
+        <xmpp:note>User tune publication/parsing helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0124.html"/>
+        <xmpp:version>1.11.2</xmpp:version>
+        <xmpp:since>2.5.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>BOSH session open and restart support are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0163.html"/>
+        <xmpp:version>1.2.2</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">PEP is used by the avatar and OMEMO helpers.</xmpp:note>
+        <xmpp:note>PEP is used by the avatar and OMEMO helpers.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0191.html"/>
+        <xmpp:version>1.3</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">Simplified blocking command support is available.</xmpp:note>
+        <xmpp:note>Simplified blocking command support is available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0199.html"/>
+        <xmpp:version>2.0.1</xmpp:version>
+        <xmpp:since>2.3.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>Server ping and keepalive flows are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0202.html"/>
+        <xmpp:version>2.0</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>Entity time replies are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0206.html"/>
+        <xmpp:version>1.4</xmpp:version>
+        <xmpp:since>2.5.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>XMPP over BOSH transport is available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0224.html"/>
+        <xmpp:version>1.0</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>Attention messages are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0231.html"/>
+        <xmpp:version>1.1</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
+        <xmpp:note>Bits of Binary helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0279.html"/>
+        <xmpp:version>0.2</xmpp:version>
+        <xmpp:since>2.0.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>Server IP check support is available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0384.html"/>
+        <xmpp:version>0.9.1</xmpp:version>
+        <xmpp:since>2.8.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">XMPP-facing OMEMO device, bundle, envelope, payload, trust, and session orchestration helpers are available; applications provide the session cipher implementation.</xmpp:note>
+        <xmpp:note>XMPP-facing OMEMO device, bundle, envelope, payload, trust, and session orchestration helpers are available; applications provide the session cipher implementation.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0388.html"/>
+        <xmpp:version>1.0.4</xmpp:version>
+        <xmpp:since>2.15.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">SASL2 authentication framing and SCRAM additional-data verification are supported.</xmpp:note>
+        <xmpp:note>SASL2 authentication framing and SCRAM additional-data verification are supported.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0440.html"/>
+        <xmpp:version>1.0.0</xmpp:version>
+        <xmpp:since>2.14.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>SASL channel-binding type discovery is supported.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0453.html"/>
-        <xmpp:status>complete</xmpp:status>
+        <xmpp:version>0.1.2</xmpp:version>
         <xmpp:since>2.19.1</xmpp:since>
-        <xmpp:note xml:lang="en">The project publishes this RDF/XML DOAP file.</xmpp:note>
+        <xmpp:status>complete</xmpp:status>
+        <xmpp:note>The project publishes RDF/XML DOAP metadata.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0454.html"/>
+        <xmpp:version>0.1.0</xmpp:version>
+        <xmpp:since>2.13.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">OMEMO media URI, AES-GCM media encryption, encrypted length, and message-body helpers are available.</xmpp:note>
+        <xmpp:note>OMEMO media URI, AES-GCM media encryption, encrypted length, and message-body helpers are available.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0474.html"/>
+        <xmpp:version>0.5.0</xmpp:version>
+        <xmpp:since>2.17.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>SCRAM downgrade-protection hash verification is supported.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0480.html"/>
+        <xmpp:version>0.2.0</xmpp:version>
+        <xmpp:since>2.16.0</xmpp:since>
         <xmpp:status>partial</xmpp:status>
-        <xmpp:note xml:lang="en">SCRAM salted-password hash upgrade tasks are supported.</xmpp:note>
+        <xmpp:note>SCRAM salted-password hash upgrade tasks are supported.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0515.html"/>
+        <xmpp:version>0.1.0</xmpp:version>
+        <xmpp:since>2.18.0</xmpp:since>
         <xmpp:status>complete</xmpp:status>
+        <xmpp:note>TLS version downgrade-protection verification is supported for TCP TLS streams.</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
 
     <release>
       <Version>
-        <revision>2.19.2</revision>
+        <revision>2.19.3</revision>
         <created>2026-07-28</created>
-        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.2"/>
+        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.3"/>
       </Version>
     </release>
   </Project>

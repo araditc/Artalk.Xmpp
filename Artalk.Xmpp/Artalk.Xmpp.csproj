@@ -13,13 +13,13 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
     <PackageTags>xmpp;jabber;net10;sasl;sasl2;scram;omemo;bosh;websocket;cisco;cisco-vtg-token;doap;xep-0388;xep-0440;xep-0453;xep-0454;xep-0474;xep-0480;xep-0515</PackageTags>
-    <Version>2.19.2</Version>
-    <AssemblyVersion>2.19.2</AssemblyVersion>
+    <Version>2.19.3</Version>
+    <AssemblyVersion>2.19.3</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Replace donation script snippet with a GitHub README friendly PayPal payment link.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add DOAP XEP versions, since metadata, and README RFC/XEP support tables.</PackageReleaseNotes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <Deterministic>true</Deterministic>

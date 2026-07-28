@@ -47,7 +47,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.19.2
+dotnet add package Artalk.Xmpp --version 2.19.3
 ```
 
 Or reference the project directly:
@@ -406,6 +406,54 @@ dotnet test .\Artalk.XmppSoloution.sln
 ## Project Metadata
 
 Artalk.Xmpp publishes XEP-0453-compatible DOAP metadata in [`doap.xml`](doap.xml). This RDF/XML file describes the project, repository, NuGet package, and implemented XMPP RFC/XEP support for software listings and automated XMPP ecosystem indexes.
+
+### RFC Support
+
+| RFC | Area | Support |
+| --- | --- | --- |
+| [RFC 6120](https://datatracker.ietf.org/doc/html/rfc6120) | XMPP Core | partial |
+| [RFC 6121](https://datatracker.ietf.org/doc/html/rfc6121) | Instant Messaging and Presence | partial |
+| [RFC 7395](https://datatracker.ietf.org/doc/html/rfc7395) | XMPP over WebSocket | complete |
+| [RFC 7622](https://datatracker.ietf.org/doc/html/rfc7622) | XMPP Address Format | partial |
+
+### XEP Support
+
+The DOAP metadata includes the current XEP document version, the first Artalk.Xmpp 2.x package version that exposed the support, implementation status, and notes for each XEP.
+
+| XEP | Spec Version | Since | Status | Notes |
+| --- | --- | --- | --- | --- |
+| [XEP-0004](https://xmpp.org/extensions/xep-0004.html) | 2.13.2 | 2.0.0 | partial | Data Forms are used by the registration and feature-negotiation helpers. |
+| [XEP-0030](https://xmpp.org/extensions/xep-0030.html) | 2.5.0 | 2.0.0 | partial | Service discovery query helpers are available. |
+| [XEP-0045](https://xmpp.org/extensions/xep-0045.html) | 1.35.5 | 2.2.0 | partial | Basic room join, leave, groupchat message, and occupant presence support. |
+| [XEP-0047](https://xmpp.org/extensions/xep-0047.html) | 2.0.1 | 2.0.0 | partial | In-band bytestream support is available for file-transfer flows. |
+| [XEP-0065](https://xmpp.org/extensions/xep-0065.html) | 1.8.2 | 2.0.0 | partial | SOCKS5 bytestream and STUN-assisted address discovery helpers are available. |
+| [XEP-0077](https://xmpp.org/extensions/xep-0077.html) | 2.4 | 2.0.0 | partial | In-band registration form flow is supported. |
+| [XEP-0084](https://xmpp.org/extensions/xep-0084.html) | 1.1.4 | 2.0.0 | partial | User avatar publication and change events expose raw avatar data and MIME type. |
+| [XEP-0085](https://xmpp.org/extensions/xep-0085.html) | 2.1 | 2.0.0 | complete | Chat state notification helpers are available. |
+| [XEP-0092](https://xmpp.org/extensions/xep-0092.html) | 1.1 | 2.0.0 | complete | Software version replies are available. |
+| [XEP-0095](https://xmpp.org/extensions/xep-0095.html) | 1.2 | 2.0.0 | partial | Deprecated stream initiation support remains for legacy file-transfer flows. |
+| [XEP-0096](https://xmpp.org/extensions/xep-0096.html) | 1.3.1 | 2.0.0 | partial | Deprecated SI file-transfer support remains for legacy interoperability. |
+| [XEP-0107](https://xmpp.org/extensions/xep-0107.html) | 1.2.2 | 2.0.0 | partial | User mood publication/parsing helpers are available. |
+| [XEP-0108](https://xmpp.org/extensions/xep-0108.html) | 1.3 | 2.0.0 | partial | User activity publication/parsing helpers are available. |
+| [XEP-0115](https://xmpp.org/extensions/xep-0115.html) | 1.6.0 | 2.0.0 | partial | Entity capabilities helpers are available. |
+| [XEP-0118](https://xmpp.org/extensions/xep-0118.html) | 1.3.0 | 2.0.0 | partial | User tune publication/parsing helpers are available. |
+| [XEP-0124](https://xmpp.org/extensions/xep-0124.html) | 1.11.2 | 2.5.0 | complete | BOSH session open and restart support are available. |
+| [XEP-0163](https://xmpp.org/extensions/xep-0163.html) | 1.2.2 | 2.0.0 | partial | PEP is used by the avatar and OMEMO helpers. |
+| [XEP-0191](https://xmpp.org/extensions/xep-0191.html) | 1.3 | 2.0.0 | partial | Simplified blocking command support is available. |
+| [XEP-0199](https://xmpp.org/extensions/xep-0199.html) | 2.0.1 | 2.3.0 | complete | Server ping and keepalive flows are available. |
+| [XEP-0202](https://xmpp.org/extensions/xep-0202.html) | 2.0 | 2.0.0 | complete | Entity time replies are available. |
+| [XEP-0206](https://xmpp.org/extensions/xep-0206.html) | 1.4 | 2.5.0 | complete | XMPP over BOSH transport is available. |
+| [XEP-0224](https://xmpp.org/extensions/xep-0224.html) | 1.0 | 2.0.0 | complete | Attention messages are available. |
+| [XEP-0231](https://xmpp.org/extensions/xep-0231.html) | 1.1 | 2.0.0 | partial | Bits of Binary helpers are available. |
+| [XEP-0279](https://xmpp.org/extensions/xep-0279.html) | 0.2 | 2.0.0 | complete | Server IP check support is available. |
+| [XEP-0384](https://xmpp.org/extensions/xep-0384.html) | 0.9.1 | 2.8.0 | partial | XMPP-facing OMEMO device, bundle, envelope, payload, trust, and session orchestration helpers are available; applications provide the session cipher implementation. |
+| [XEP-0388](https://xmpp.org/extensions/xep-0388.html) | 1.0.4 | 2.15.0 | partial | SASL2 authentication framing and SCRAM additional-data verification are supported. |
+| [XEP-0440](https://xmpp.org/extensions/xep-0440.html) | 1.0.0 | 2.14.0 | complete | SASL channel-binding type discovery is supported. |
+| [XEP-0453](https://xmpp.org/extensions/xep-0453.html) | 0.1.2 | 2.19.1 | complete | The project publishes RDF/XML DOAP metadata. |
+| [XEP-0454](https://xmpp.org/extensions/xep-0454.html) | 0.1.0 | 2.13.0 | partial | OMEMO media URI, AES-GCM media encryption, encrypted length, and message-body helpers are available. |
+| [XEP-0474](https://xmpp.org/extensions/xep-0474.html) | 0.5.0 | 2.17.0 | complete | SCRAM downgrade-protection hash verification is supported. |
+| [XEP-0480](https://xmpp.org/extensions/xep-0480.html) | 0.2.0 | 2.16.0 | partial | SCRAM salted-password hash upgrade tasks are supported. |
+| [XEP-0515](https://xmpp.org/extensions/xep-0515.html) | 0.1.0 | 2.18.0 | complete | TLS version downgrade-protection verification is supported for TCP TLS streams. |
 
 ## License
 
