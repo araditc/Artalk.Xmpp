@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns="http://usefulinc.com/ns/doap#"
+         xmlns:xmpp="https://linkmauve.fr/ns/xmpp-doap#"
+         xmlns:schema="https://schema.org/">
+  <Project xml:lang="en">
+    <name>Artalk.Xmpp</name>
+    <shortdesc xml:lang="en">A .NET 10 XMPP client library</shortdesc>
+    <description xml:lang="en">Artalk.Xmpp is a .NET 10 library for connecting to XMPP servers, sending and receiving messages, managing presence and rosters, and using common XMPP extension protocols.</description>
+    <homepage rdf:resource="https://github.com/araditc/Artalk.Xmpp"/>
+    <schema:documentation rdf:resource="https://github.com/araditc/Artalk.Xmpp#readme"/>
+    <download-page rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp"/>
+    <bug-database rdf:resource="https://github.com/araditc/Artalk.Xmpp/issues"/>
+    <license rdf:resource="https://github.com/araditc/Artalk.Xmpp/blob/master/LICENSE"/>
+    <programming-language>C#</programming-language>
+    <os>.NET 10</os>
+    <category rdf:resource="https://linkmauve.fr/ns/xmpp-doap#category-library"/>
+
+    <repository>
+      <GitRepository>
+        <browse rdf:resource="https://github.com/araditc/Artalk.Xmpp"/>
+        <location rdf:resource="https://github.com/araditc/Artalk.Xmpp.git"/>
+      </GitRepository>
+    </repository>
+
+    <implements rdf:resource="https://xmpp.org/rfcs/rfc6120.html"/>
+    <implements rdf:resource="https://xmpp.org/rfcs/rfc6121.html"/>
+    <implements rdf:resource="https://xmpp.org/rfcs/rfc7395.html"/>
+    <implements rdf:resource="https://xmpp.org/rfcs/rfc7622.html"/>
+
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0004.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">Data Forms are used by the registration and feature-negotiation helpers.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0030.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">Service discovery query helpers are available.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0045.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">Basic room join, leave, groupchat message, and occupant presence support.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0047.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">In-band bytestream support is available for file-transfer flows.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0065.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">SOCKS5 bytestream and STUN-assisted address discovery helpers are available.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0077.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">In-band registration form flow is supported.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0084.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">User avatar publication and change events expose raw avatar data and MIME type.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0085.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0092.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0095.html"/>
+        <xmpp:status>partial</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0096.html"/>
+        <xmpp:status>partial</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0107.html"/>
+        <xmpp:status>partial</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0108.html"/>
+        <xmpp:status>partial</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0115.html"/>
+        <xmpp:status>partial</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0118.html"/>
+        <xmpp:status>partial</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0124.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0163.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">PEP is used by the avatar and OMEMO helpers.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0191.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">Simplified blocking command support is available.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0199.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0202.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0206.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0224.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0231.html"/>
+        <xmpp:status>partial</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0279.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0384.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">XMPP-facing OMEMO device, bundle, envelope, payload, trust, and session orchestration helpers are available; applications provide the session cipher implementation.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0388.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">SASL2 authentication framing and SCRAM additional-data verification are supported.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0440.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0453.html"/>
+        <xmpp:status>complete</xmpp:status>
+        <xmpp:since>2.19.1</xmpp:since>
+        <xmpp:note xml:lang="en">The project publishes this RDF/XML DOAP file.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0454.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">OMEMO media URI, AES-GCM media encryption, encrypted length, and message-body helpers are available.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0474.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0480.html"/>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note xml:lang="en">SCRAM salted-password hash upgrade tasks are supported.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0515.html"/>
+        <xmpp:status>complete</xmpp:status>
+      </xmpp:SupportedXep>
+    </implements>
+
+    <release>
+      <Version>
+        <revision>2.19.1</revision>
+        <created>2026-07-28</created>
+        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.1"/>
+      </Version>
+    </release>
+  </Project>
+</rdf:RDF>

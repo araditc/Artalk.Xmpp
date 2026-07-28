@@ -1,6 +1,6 @@
 # Artalk.Xmpp
 
-[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) - 137,762 total downloads as of 2026-07-08
+[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) - 145,510 total downloads as of 2026-07-28
 
 Artalk.Xmpp is a .NET 10 XMPP client library for connecting to XMPP servers, sending and receiving messages, managing presence and rosters, and using common XMPP extension protocols.
 
@@ -25,6 +25,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - XEP-0474 SASL SCRAM Downgrade Protection hash verification
 - XEP-0480 SASL Upgrade Tasks for SCRAM salted-password hash upgrades over SASL2
 - XEP-0515 TLS Channel-Binding Downgrade Protection for SCRAM over TCP TLS
+- XEP-0453 DOAP project metadata: [`doap.xml`](doap.xml)
 - Optional legacy XMPP session establishment
 - Instant messaging and presence
 - Multi-user chat basics: join, leave, groupchat messages, and occupant presence
@@ -46,7 +47,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.19.0
+dotnet add package Artalk.Xmpp --version 2.19.1
 ```
 
 Or reference the project directly:
@@ -402,6 +403,24 @@ dotnet build .\Artalk.XmppSoloution.sln
 dotnet test .\Artalk.XmppSoloution.sln
 ```
 
+## Project Metadata
+
+Artalk.Xmpp publishes XEP-0453-compatible DOAP metadata in [`doap.xml`](doap.xml). This RDF/XML file describes the project, repository, NuGet package, and implemented XMPP RFC/XEP support for software listings and automated XMPP ecosystem indexes.
+
 ## License
 
 This project is released under the MIT License.
+
+## Donate
+
+Artalk.Xmpp is maintained as an open-source .NET/XMPP library. If this project saves you time, helps a production integration, or gives you a cleaner starting point for XMPP work, a donation helps keep the library maintained, tested, documented, and published on NuGet.
+
+GitHub README pages do not execute PayPal JavaScript, so the PayPal Hosted Buttons SDK snippet is kept here for project websites or documentation pages that allow scripts:
+
+```html
+<script
+  src="https://www.paypal.com/sdk/js?client-id=BAA9v8l4TWk6aHn116PSOC3GFI9MizuLwODIKedlVdenjjUaRZ8_f0iG3sEatKG0slG7qxC-DY8pOHFl2w&components=hosted-buttons&disable-funding=venmo&currency=USD">
+</script>
+```
+
+To render a live PayPal hosted donation button outside GitHub Markdown, place PayPal's hosted button container and `paypal.HostedButtons({ hostedButtonId: "..." }).render(...)` call after this SDK script.

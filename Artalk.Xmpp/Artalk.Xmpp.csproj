@@ -12,14 +12,14 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <PackageTags>xmpp;jabber;net10;sasl;sasl2;scram;omemo;bosh;websocket;cisco;cisco-vtg-token;xep-0388;xep-0440;xep-0454;xep-0474;xep-0480;xep-0515</PackageTags>
-    <Version>2.19.0</Version>
-    <AssemblyVersion>2.19.0</AssemblyVersion>
+    <PackageTags>xmpp;jabber;net10;sasl;sasl2;scram;omemo;bosh;websocket;cisco;cisco-vtg-token;doap;xep-0388;xep-0440;xep-0453;xep-0454;xep-0474;xep-0480;xep-0515</PackageTags>
+    <Version>2.19.1</Version>
+    <AssemblyVersion>2.19.1</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Add Cisco VTG token SASL authentication support for Cisco Jabber deployments.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add XEP-0453 DOAP metadata and donation documentation.</PackageReleaseNotes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <Deterministic>true</Deterministic>
@@ -35,6 +35,7 @@
     <None Remove="Client\Examples.xml" />
     <None Remove="favicon.ico" />
     <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\doap.xml" Pack="true" PackagePath="\" />
     <None Include="arad-Logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
@@ -44,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.301" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
