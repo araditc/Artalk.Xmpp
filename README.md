@@ -47,7 +47,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.19.1
+dotnet add package Artalk.Xmpp --version 2.19.2
 ```
 
 Or reference the project directly:
@@ -415,12 +415,6 @@ This project is released under the MIT License.
 
 Artalk.Xmpp is maintained as an open-source .NET/XMPP library. If this project saves you time, helps a production integration, or gives you a cleaner starting point for XMPP work, a donation helps keep the library maintained, tested, documented, and published on NuGet.
 
-GitHub README pages do not execute PayPal JavaScript, so the PayPal Hosted Buttons SDK snippet is kept here for project websites or documentation pages that allow scripts:
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal)](https://www.paypal.com/ncp/payment/QSWNJM49EA2FG)
 
-```html
-<script
-  src="https://www.paypal.com/sdk/js?client-id=BAA9v8l4TWk6aHn116PSOC3GFI9MizuLwODIKedlVdenjjUaRZ8_f0iG3sEatKG0slG7qxC-DY8pOHFl2w&components=hosted-buttons&disable-funding=venmo&currency=USD">
-</script>
-```
-
-To render a live PayPal hosted donation button outside GitHub Markdown, place PayPal's hosted button container and `paypal.HostedButtons({ hostedButtonId: "..." }).render(...)` call after this SDK script.
+You can also donate directly through this PayPal payment link: [Donate to Artalk.Xmpp](https://www.paypal.com/ncp/payment/QSWNJM49EA2FG).

@@ -238,9 +238,9 @@
 
     <release>
       <Version>
-        <revision>2.19.1</revision>
+        <revision>2.19.2</revision>
         <created>2026-07-28</created>
-        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.1"/>
+        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.2"/>
       </Version>
     </release>
   </Project>
