@@ -28,6 +28,16 @@ namespace Artalk.Xmpp.Core.Sasl {
 			}
 		}
 
+		public bool SupportsBind2 {
+			get {
+				foreach (XmlElement inlineFeature in inlineFeatures) {
+					if (Bind2Feature.IsBind2Element(inlineFeature))
+						return true;
+				}
+				return false;
+			}
+		}
+
 		Sasl2Feature(List<string> mechanisms, List<XmlElement> inlineFeatures,
 			List<string> upgradeTasks) {
 			this.mechanisms = mechanisms;

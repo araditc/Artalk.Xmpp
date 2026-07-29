@@ -12,14 +12,14 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>arad-Logo.png</PackageIcon>
-    <PackageTags>xmpp;jabber;net10;sasl;sasl2;scram;omemo;bosh;websocket;cisco;cisco-vtg-token;doap;rfc7590;xep-0020;xep-0049;xep-0388;xep-0440;xep-0453;xep-0454;xep-0474;xep-0480;xep-0515</PackageTags>
-    <Version>2.19.4</Version>
-    <AssemblyVersion>2.19.4</AssemblyVersion>
+    <PackageTags>xmpp;jabber;net10;sasl;sasl2;scram;omemo;bosh;websocket;cisco;cisco-vtg-token;doap;rfc7590;xep-0020;xep-0049;xep-0386;xep-0388;xep-0440;xep-0453;xep-0454;xep-0474;xep-0480;xep-0515</PackageTags>
+    <Version>2.20.0</Version>
+    <AssemblyVersion>2.20.0</AssemblyVersion>
     <Product>Artalk.Xmpp</Product>
     <PackageId>Artalk.Xmpp</PackageId>
     <AssemblyName>Artalk.Xmpp</AssemblyName>
     <RootNamespace>Artalk.Xmpp</RootNamespace>
-    <PackageReleaseNotes>Add missing RFC and XEP references to README and DOAP metadata.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add XEP-0386 Bind 2 support for SASL2 inline resource binding.</PackageReleaseNotes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <Deterministic>true</Deterministic>

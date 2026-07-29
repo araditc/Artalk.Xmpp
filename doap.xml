@@ -274,6 +274,15 @@
     </implements>
     <implements>
       <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0386.html"/>
+        <xmpp:version>1.1.0</xmpp:version>
+        <xmpp:since>2.20.0</xmpp:since>
+        <xmpp:status>partial</xmpp:status>
+        <xmpp:note>Bind 2 discovery, SASL2 inline bind request, optional tag, and authorization-identifier parsing are supported; linked inline session features remain future work.</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
         <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0388.html"/>
         <xmpp:version>1.0.4</xmpp:version>
         <xmpp:since>2.15.0</xmpp:since>
@@ -338,9 +347,9 @@
 
     <release>
       <Version>
-        <revision>2.19.4</revision>
-        <created>2026-07-28</created>
-        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.19.4"/>
+        <revision>2.20.0</revision>
+        <created>2026-07-29</created>
+        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.20.0"/>
       </Version>
     </release>
   </Project>

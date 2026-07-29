@@ -34,6 +34,7 @@ public sealed class Sasl2FeatureTests {
 		Assert.AreEqual("urn:xmpp:bind:0", feature.InlineFeatures[0].NamespaceURI);
 		Assert.AreEqual("sm", feature.InlineFeatures[1].LocalName);
 		Assert.AreEqual("urn:xmpp:sm:3", feature.InlineFeatures[1].NamespaceURI);
+		Assert.IsTrue(feature.SupportsBind2);
 		CollectionAssert.AreEqual(new[] {
 			"UPGR-SCRAM-SHA-256",
 			"UPGR-SCRAM-SHA-512"
@@ -80,6 +81,46 @@ public sealed class Sasl2FeatureTests {
 		XmlElement initial = authenticate["initial-response", Sasl2Feature.Namespace]!;
 		Assert.IsNotNull(initial);
 		Assert.AreEqual("AHVzZXIAc2VjcmV0", initial.InnerText);
+	}
+
+	[TestMethod]
+	public void CreatesAuthenticateWithBind2Request() {
+		var mechanism = new SaslPlain("user", "secret");
+		XmlElement bind = Bind2Feature.CreateRequest("Artalk.Xmpp");
+
+		XmlElement authenticate = XmppCore.CreateSasl2AuthenticateElement(
+			mechanism, bind2Request: bind);
+
+		XmlElement bindRequest = authenticate["bind", Bind2Feature.Namespace]!;
+		Assert.IsNotNull(bindRequest);
+		XmlElement tag = bindRequest["tag", Bind2Feature.Namespace]!;
+		Assert.IsNotNull(tag);
+		Assert.AreEqual("Artalk.Xmpp", tag.InnerText);
+	}
+
+	[TestMethod]
+	public void CreatesBind2RequestWithoutTag() {
+		XmlElement bind = Bind2Feature.CreateRequest();
+
+		Assert.AreEqual("bind", bind.LocalName);
+		Assert.AreEqual(Bind2Feature.Namespace, bind.NamespaceURI);
+		Assert.IsNull(bind["tag", Bind2Feature.Namespace]);
+	}
+
+	[TestMethod]
+	public void ParsesBind2AuthorizationIdentifier() {
+		XmlElement success = Load(
+			"<success xmlns='urn:xmpp:sasl:2'>" +
+			"<authorization-identifier>user@example.com/Artalk.1234</authorization-identifier>" +
+			"<bound xmlns='urn:xmpp:bind:0'/>" +
+			"</success>");
+
+		var jid = Bind2Feature.GetAuthorizationIdentifier(success);
+
+		Assert.IsNotNull(jid);
+		Assert.AreEqual("user", jid.Node);
+		Assert.AreEqual("example.com", jid.Domain);
+		Assert.AreEqual("Artalk.1234", jid.Resource);
 	}
 
 	[TestMethod]

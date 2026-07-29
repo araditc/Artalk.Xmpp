@@ -21,6 +21,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 - RFC 7395 XMPP over WebSocket
 - RFC 6120 SASL authentication: OAUTHBEARER, CISCO-VTG-TOKEN, SCRAM-SHA3-512-PLUS, SCRAM-SHA3-512, SCRAM-SHA-512-PLUS, SCRAM-SHA-512, SCRAM-SHA-384-PLUS, SCRAM-SHA-384, SCRAM-SHA-256-PLUS, SCRAM-SHA-256, SCRAM-SHA-224-PLUS, SCRAM-SHA-224, SCRAM-SHA-1-PLUS, SCRAM-SHA-1, DIGEST-MD5, PLAIN
 - XEP-0388 SASL2 foundation: stream-feature parsing, SASL2 authentication framing, additional-data handling, and no post-success stream restart
+- XEP-0386 Bind 2 resource binding over SASL2 with `authorization-identifier` parsing
 - XEP-0440 SASL Channel-Binding Type Capability for SCRAM-PLUS selection
 - XEP-0474 SASL SCRAM Downgrade Protection hash verification
 - XEP-0480 SASL Upgrade Tasks for SCRAM salted-password hash upgrades over SASL2
@@ -49,7 +50,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.19.4
+dotnet add package Artalk.Xmpp --version 2.20.0
 ```
 
 Or reference the project directly:
@@ -388,6 +389,8 @@ When a SCRAM server-first-message includes the XEP-0515 `t` attribute on a TCP T
 
 When an encrypted stream advertises XEP-0388 SASL2, Artalk.Xmpp uses the SASL2 `<authentication/>` profile, sends initial responses inside `<initial-response/>`, verifies SCRAM server signatures from `<additional-data/>`, and waits for the authenticated `<stream:features/>` without restarting the stream.
 
+When the same SASL2 profile advertises XEP-0386 Bind 2, Artalk.Xmpp includes an inline `<bind xmlns='urn:xmpp:bind:0'/>` request in `<authenticate/>`, uses the `Connect(resource)` value as the optional Bind 2 `<tag/>`, and reads the final full JID from `<authorization-identifier/>`. If Bind 2 is not advertised, the client falls back to the legacy RFC 6120 resource bind IQ.
+
 If the SASL2 feature advertises XEP-0480 SCRAM upgrade tasks and password authentication is available, Artalk.Xmpp requests supported `UPGR-SCRAM-*` tasks, handles the SASL2 `<continue/>` flow, derives the requested salted password from the server-provided salt and iteration count, and returns it inside `<task-data><hash/></task-data>`. Upgrade tasks that are not SCRAM hash upgrades remain unsupported and fail with a clear authentication error.
 
 When a server advertises legacy XMPP session establishment, Artalk.Xmpp completes it. Modern servers that omit the legacy session feature are no longer rejected during sign-in.
@@ -452,6 +455,7 @@ The DOAP metadata includes the current XEP document version, the first Artalk.Xm
 | [XEP-0231](https://xmpp.org/extensions/xep-0231.html) | 1.1 | 2.0.0 | partial | Bits of Binary helpers are available. |
 | [XEP-0279](https://xmpp.org/extensions/xep-0279.html) | 0.2 | 2.0.0 | complete | Server IP check support is available. |
 | [XEP-0384](https://xmpp.org/extensions/xep-0384.html) | 0.9.1 | 2.8.0 | partial | XMPP-facing OMEMO device, bundle, envelope, payload, trust, and session orchestration helpers are available; applications provide the session cipher implementation. |
+| [XEP-0386](https://xmpp.org/extensions/xep-0386.html) | 1.1.0 | 2.20.0 | partial | Bind 2 discovery, SASL2 inline bind request, optional tag, and authorization-identifier parsing are supported; linked inline session features remain future work. |
 | [XEP-0388](https://xmpp.org/extensions/xep-0388.html) | 1.0.4 | 2.15.0 | partial | SASL2 authentication framing and SCRAM additional-data verification are supported. |
 | [XEP-0440](https://xmpp.org/extensions/xep-0440.html) | 1.0.0 | 2.14.0 | complete | SASL channel-binding type discovery is supported. |
 | [XEP-0453](https://xmpp.org/extensions/xep-0453.html) | 0.1.2 | 2.19.1 | complete | The project publishes RDF/XML DOAP metadata. |

@@ -900,11 +900,13 @@ namespace Artalk.Xmpp.Core {
 				return;
 			Sasl2Feature sasl2Feature = Sasl2Feature.Parse(feats);
 			HashSet<string> channelBindingTypes = GetChannelBindingTypes(feats);
+			bool boundWithSasl2 = false;
 			// Continue with SASL authentication.
 			try {
 				if (sasl2Feature != null && IsEncrypted) {
 					feats = Authenticate(sasl2Feature, channelBindingTypes, Username,
-						Password, Hostname);
+						Password, Hostname, resource);
+					boundWithSasl2 = sasl2Feature.SupportsBind2;
 				} else {
 					// Construct a list of legacy SASL mechanisms supported by the server.
 					var list = GetSaslMechanisms(feats);
@@ -916,7 +918,7 @@ namespace Artalk.Xmpp.Core {
 				SessionSupported = feats["session"] != null;
 				// FIXME: How is the client's JID constructed if the server does not support
 				// resource binding?
-				if (feats["bind"] != null)
+				if (!boundWithSasl2 && feats["bind"] != null)
 					Jid = BindResource(resource);
 			} catch (SaslException e) {
 				throw new AuthenticationException("Authentication failed.", e);
@@ -1067,7 +1069,7 @@ namespace Artalk.Xmpp.Core {
 
 		XmlElement Authenticate(Sasl2Feature feature,
 			IEnumerable<string> channelBindingTypes, string username, string password,
-			string hostname) {
+			string hostname, string bind2Tag = null) {
 				string name = SelectMechanism(feature.Mechanisms, channelBindingTypes);
 				SaslMechanism m = CreateSaslMechanism(name, username, password,
 					hostname);
@@ -1075,7 +1077,9 @@ namespace Artalk.Xmpp.Core {
 					channelBindingTypes);
 				IReadOnlyList<string> upgradeTasks =
 					SaslUpgradeTask.SelectSupported(feature.UpgradeTasks, password);
-				Send(CreateSasl2AuthenticateElement(m, upgradeTasks));
+				XmlElement bind2Request = feature.SupportsBind2 ?
+					Bind2Feature.CreateRequest(bind2Tag) : null;
+				Send(CreateSasl2AuthenticateElement(m, upgradeTasks, bind2Request));
 				while (true) {
 					XmlElement ret = Receive("challenge", "success", "failure",
 						"continue");
@@ -1097,6 +1101,12 @@ namespace Artalk.Xmpp.Core {
 						else if (!m.IsCompleted)
 							throw new SaslException("SASL2 authentication success did " +
 								"not include mechanism completion data.");
+						if (bind2Request != null) {
+							Jid = Bind2Feature.GetAuthorizationIdentifier(ret);
+							if (Jid == null)
+								throw new SaslException("SASL2 Bind 2 success did not " +
+									"include an authorization identifier.");
+						}
 						Authenticated = true;
 						return Receive("stream:features");
 					}
@@ -1155,7 +1165,8 @@ namespace Artalk.Xmpp.Core {
 		}
 
 		internal static XmlElement CreateSasl2AuthenticateElement(
-			SaslMechanism mechanism, IEnumerable<string> upgradeTasks = null) {
+			SaslMechanism mechanism, IEnumerable<string> upgradeTasks = null,
+			XmlElement bind2Request = null) {
 				mechanism.ThrowIfNull("mechanism");
 				var xml = Xml.Element("authenticate", Sasl2Feature.Namespace)
 					.Attr("mechanism", mechanism.Name);
@@ -1167,6 +1178,8 @@ namespace Artalk.Xmpp.Core {
 					xml.Child(Xml.Element("initial-response", Sasl2Feature.Namespace)
 						.Text(mechanism.GetResponse(String.Empty)));
 				}
+				if (bind2Request != null)
+					xml.Child(bind2Request);
 				return xml;
 		}
 
