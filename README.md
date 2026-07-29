@@ -50,7 +50,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.20.0
+dotnet add package Artalk.Xmpp --version 2.20.1
 ```
 
 Or reference the project directly:

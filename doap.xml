@@ -12,8 +12,12 @@
     <download-page rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp"/>
     <bug-database rdf:resource="https://github.com/araditc/Artalk.Xmpp/issues"/>
     <license rdf:resource="https://github.com/araditc/Artalk.Xmpp/blob/master/LICENSE"/>
+    <programming-language>.NET</programming-language>
     <programming-language>C#</programming-language>
     <os>.NET 10</os>
+    <os>Linux</os>
+    <os>macOS</os>
+    <os>Windows</os>
     <category rdf:resource="https://linkmauve.fr/ns/xmpp-doap#category-library"/>
 
     <repository>
@@ -347,9 +351,9 @@
 
     <release>
       <Version>
-        <revision>2.20.0</revision>
+        <revision>2.20.1</revision>
         <created>2026-07-29</created>
-        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.20.0"/>
+        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.20.1"/>
       </Version>
     </release>
   </Project>
