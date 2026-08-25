@@ -6,6 +6,7 @@ namespace Artalk.Xmpp.Core {
 	internal static class ChannelBinding {
 		public const string Namespace = "urn:xmpp:sasl-cb:0";
 		public const string TlsServerEndPoint = "tls-server-end-point";
+		public const string TlsExporter = "tls-exporter";
 
 		public static byte[] CreateTlsServerEndPoint(X509Certificate certificate) {
 			certificate.ThrowIfNull("certificate");

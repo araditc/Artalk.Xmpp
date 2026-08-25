@@ -351,9 +351,9 @@
 
     <release>
       <Version>
-        <revision>2.20.1</revision>
-        <created>2026-07-29</created>
-        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.20.1"/>
+        <revision>2.20.2</revision>
+        <created>2026-08-25</created>
+        <file-release rdf:resource="https://www.nuget.org/packages/Artalk.Xmpp/2.20.2"/>
       </Version>
     </release>
   </Project>

@@ -39,7 +39,7 @@ public sealed class SaslScramSha256Tests {
 	public void DowngradeProtectionHashMatchesXep0474Example() {
 		string hash = SaslScramDowngradeProtection.Compute("SCRAM-SHA-1-PLUS",
 			new[] { "SCRAM-SHA-1", "SCRAM-SHA-1-PLUS" },
-			new[] { "tls-server-end-point", "tls-exporter" });
+			new[] { ChannelBinding.TlsServerEndPoint, ChannelBinding.TlsExporter });
 
 		Assert.AreEqual("G6k/rBLDqgOhRRaCuuatSDFkJ08=", hash);
 	}
@@ -226,7 +226,7 @@ public sealed class SaslScramSha256Tests {
 
 		string mechanism = SelectMechanism(core,
 			new[] { "SCRAM-SHA-256", "SCRAM-SHA-256-PLUS" },
-			new[] { "tls-exporter" });
+			new[] { ChannelBinding.TlsExporter });
 
 		Assert.AreEqual("SCRAM-SHA-256", mechanism);
 	}
@@ -247,7 +247,7 @@ public sealed class SaslScramSha256Tests {
 			"<stream:features xmlns:stream='http://etherx.jabber.org/streams'>" +
 			"<sasl-channel-binding xmlns='urn:xmpp:sasl-cb:0'>" +
 			"<channel-binding type='tls-server-end-point'/>" +
-			"<channel-binding type='tls-exporter'/>" +
+			"<channel-binding type='" + ChannelBinding.TlsExporter + "'/>" +
 			"</sasl-channel-binding>" +
 			"</stream:features>");
 		MethodInfo method = typeof(XmppCore).GetMethod("GetChannelBindingTypes",
@@ -258,7 +258,7 @@ public sealed class SaslScramSha256Tests {
 
 		CollectionAssert.AreEquivalent(new[] {
 			ChannelBinding.TlsServerEndPoint,
-			"tls-exporter"
+			ChannelBinding.TlsExporter
 		}, types.ToArray());
 	}
 

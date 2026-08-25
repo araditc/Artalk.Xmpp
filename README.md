@@ -50,7 +50,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.20.1
+dotnet add package Artalk.Xmpp --version 2.20.2
 ```
 
 Or reference the project directly:
@@ -381,7 +381,7 @@ OMEMO support covers current XEP-0384 device list and bundle publication/retriev
 
 OMEMO media sharing support covers XEP-0454 `aesgcm://` URL creation/parsing, AES-256-GCM encryption/decryption, appended authentication tags, strict message-body parsing, and optional JPEG thumbnails. Do not display `aesgcm://` links as browser-openable URLs; the URI fragment contains encryption key material and must stay inside the OMEMO-encrypted message flow. Only HTTPS download/upload URLs are accepted when creating media URIs.
 
-SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. Artalk.Xmpp understands XEP-0440 `sasl-channel-binding` announcements and uses SCRAM-PLUS only when `tls-server-end-point` is mutually supported, while preserving compatibility with servers that have not implemented XEP-0440 yet. The .NET `SslStream` API does not currently expose the TLS Finished messages needed for `tls-unique` or TLS exporter keying material needed for `tls-exporter`, so those binding types are not advertised by Artalk.Xmpp yet.
+SCRAM `-PLUS` mechanisms are preferred automatically on encrypted TCP XMPP streams when the server advertises them and a remote certificate is available. Artalk.Xmpp understands XEP-0440 `sasl-channel-binding` announcements and uses SCRAM-PLUS only when `tls-server-end-point` is mutually supported, while preserving compatibility with servers that have not implemented XEP-0440 yet. RFC 9266 defines `tls-exporter` as the TLS 1.3 channel-binding type, but .NET `SslStream` does not currently expose TLS exporter keying material; the related runtime API requests are tracked in dotnet/runtime#73118 and dotnet/runtime#112529. Until that API exists, Artalk.Xmpp intentionally does not advertise or select `tls-exporter`. The .NET API also does not expose the TLS Finished messages needed for `tls-unique`.
 
 When a SCRAM server-first-message includes the XEP-0474 `h` attribute, Artalk.Xmpp verifies it against the hash of the SASL mechanism list and XEP-0440 channel-binding type list that were actually advertised for the active SASL profile. A mismatch fails authentication before the client proof is sent, protecting SCRAM and SCRAM-PLUS negotiation from active downgrade tampering.
 
