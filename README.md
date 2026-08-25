@@ -1,6 +1,7 @@
 # Artalk.Xmpp
 
-[NuGet: Artalk.Xmpp](https://www.nuget.org/packages/Artalk.Xmpp) - 145,510 total downloads as of 2026-07-28
+[![NuGet version](https://img.shields.io/nuget/v/Artalk.Xmpp?logo=nuget)](https://www.nuget.org/packages/Artalk.Xmpp)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Artalk.Xmpp?logo=nuget&label=NuGet%20downloads)](https://www.nuget.org/packages/Artalk.Xmpp)
 
 Artalk.Xmpp is a .NET 10 XMPP client library for connecting to XMPP servers, sending and receiving messages, managing presence and rosters, and using common XMPP extension protocols.
 
@@ -50,7 +51,7 @@ The core library targets `net10.0` and does not require Windows-only packages.
 Install the NuGet package:
 
 ```powershell
-dotnet add package Artalk.Xmpp --version 2.20.2
+dotnet add package Artalk.Xmpp --version 2.20.3
 ```
 
 Or reference the project directly:
